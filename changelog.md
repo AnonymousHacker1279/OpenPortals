@@ -1,4 +1,3 @@
-v1.0.10
+v1.0.11
 
-- Ported to 1.21.1
-- Fire post teleport event again - AnonymousHacker1279
+- Fix ResourceLocationException errors - AnonymousHacker1279
