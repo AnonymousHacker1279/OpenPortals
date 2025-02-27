@@ -38,18 +38,19 @@ public class CustomPortalApiRegistry {
     }
 
     public static void addPortal(Block frameBlock, PortalLink link) {
-        if (frameBlock == null) CustomPortalsMod.logError("Frameblock is null");
-        if (link.getPortalBlock() == null) CustomPortalsMod.logError("Portal block is null");
-        if (link.portalIgnitionSource == null) CustomPortalsMod.logError("Portal ignition source is null");
-        if (link.dimID == null) CustomPortalsMod.logError("Dimension is null");
-        if (CustomPortalsMod.dims.size() > 0 && !CustomPortalsMod.dims.containsKey(link.dimID))
-            CustomPortalsMod.logError("Dimension not found");
+        if (frameBlock == null) throw new RuntimeException("Frame block must not be null");
+        if (link.getPortalBlock() == null) throw new RuntimeException("Portal block must not be null");
+        if (link.portalIgnitionSource == null) throw new RuntimeException("Portal ignition source must not be null");
+        if (link.dimID == null) throw new RuntimeException("Dimension is null");
+        if (!CustomPortalsMod.dims.isEmpty() && !CustomPortalsMod.dims.containsKey(link.dimID))
+            throw new RuntimeException("Dimension not found");
         if (CustomPortalsMod.getDefaultPortalBlock() == null)
-            CustomPortalsMod.logError("Built in CustomPortalBlock is null");
+            throw new RuntimeException("Built-in CustomPortalBlock is null");
 
         if (portals.containsKey(frameBlock) || frameBlock.equals(Blocks.OBSIDIAN)) {
-            CustomPortalsMod.logError(
-                    "A portal(or the nether portal) is already registered with a frame of: " + frameBlock);
+            throw new RuntimeException(
+                    "A portal of the frame '" + frameBlock + "' is already registered"
+            );
         } else {
             portals.put(frameBlock, link);
         }
