@@ -4,3 +4,4 @@ v1.2.0
 - Update the wiki for these changes - Wolfieboy09
 - Move to RuntimeException over logging an error to get the user's attention on why it won't work - Wolfieboy09
 - Code cleanup - Wolfieboy09
+- Fixes portal colors.
