@@ -1,12 +1,6 @@
 package net.kyrptonaught.customportalapi;
 
 import com.mojang.logging.LogUtils;
-import net.kyrptonaught.customportalapi.portal.PortalIgnitionSource;
-import net.kyrptonaught.customportalapi.portal.PortalPlacer;
-import net.kyrptonaught.customportalapi.portal.frame.FlatPortalAreaHelper;
-import net.kyrptonaught.customportalapi.portal.frame.VanillaPortalAreaHelper;
-import net.kyrptonaught.customportalapi.portal.linking.PortalLinkingStorage;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -14,9 +8,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.bus.api.IEventBus;
@@ -32,20 +26,40 @@ import org.slf4j.Logger;
 import java.util.HashMap;
 import java.util.function.Supplier;
 
+import net.kyrptonaught.customportalapi.portal.PortalIgnitionSource;
+import net.kyrptonaught.customportalapi.portal.PortalPlacer;
+import net.kyrptonaught.customportalapi.portal.frame.FlatPortalAreaHelper;
+import net.kyrptonaught.customportalapi.portal.frame.VanillaPortalAreaHelper;
+import net.kyrptonaught.customportalapi.portal.linking.PortalLinkingStorage;
+
 @Mod(CustomPortalsMod.MOD_ID)
 public class CustomPortalsMod {
+
     public static final String MOD_ID = "cpapireforged";
+
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MOD_ID);
 
-    public static final Supplier<CustomPortalBlock> portalBlock = BLOCKS.register("custom_portal_block",
-            () -> new CustomPortalBlock(
-                    Block.Properties.ofFullCopy(Blocks.NETHER_PORTAL).noCollission().strength(-1).sound(
-                            SoundType.GLASS).lightLevel(state -> 11)));
+    public static final Supplier<CustomPortalBlock> portalBlock = BLOCKS.register(
+        "custom_portal_block",
+        () -> new CustomPortalBlock(
+            BlockBehaviour.Properties.ofFullCopy(Blocks.NETHER_PORTAL)
+                .noCollission()
+                .strength(-1)
+                .sound(
+                    SoundType.GLASS
+                )
+                .lightLevel(state -> 11)
+        )
+    );
+
     public static HashMap<ResourceLocation, ResourceKey<Level>> dims = new HashMap<>();
+
     public static ResourceLocation VANILLAPORTAL_FRAMETESTER = ResourceLocation.fromNamespaceAndPath(MOD_ID, "vanillanether");
+
     public static ResourceLocation FLATPORTAL_FRAMETESTER = ResourceLocation.fromNamespaceAndPath(MOD_ID, "flat");
+
     public static PortalLinkingStorage portalLinkingStorage;
 
     public CustomPortalsMod(IEventBus bus) {
@@ -71,15 +85,22 @@ public class CustomPortalsMod {
     }
 
     public void createPortals(CustomPortalRegistrationEvent event) {
-//        CustomPortalBuilder builder = CustomPortalBuilder.beginPortal().frameBlock(Blocks.GLOWSTONE).destDimID(ResourceLocation.withDefaultNamespace("the_nether")).lightWithWater().tintColor(46, 5, 25);
-//        event.register(builder);
+        // CustomPortalBuilder builder =
+        // CustomPortalBuilder.beginPortal().frameBlock(Blocks.GLOWSTONE).destDimID(ResourceLocation.withDefaultNamespace("the_nether")).lightWithWater().tintColor(255,
+        // 0, 255);
+        // event.register(builder);
     }
 
     private void onServerStart(ServerStartedEvent event) {
         for (ResourceKey<Level> registryKey : event.getServer().levelKeys())
             dims.put(registryKey.location(), registryKey);
-        portalLinkingStorage = event.getServer().overworld().getDataStorage().computeIfAbsent(
-                PortalLinkingStorage.factory(), MOD_ID);
+        portalLinkingStorage = event.getServer()
+            .overworld()
+            .getDataStorage()
+            .computeIfAbsent(
+                PortalLinkingStorage.factory(),
+                MOD_ID
+            );
     }
 
     private void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
@@ -94,9 +115,13 @@ public class CustomPortalsMod {
                 HitResult hit = player.pick(6, 1, false);
                 if (hit.getType() == HitResult.Type.BLOCK) {
                     BlockHitResult blockHit = (BlockHitResult) hit;
-                    if (!PortalPlacer.attemptPortalLight(world,
+                    if (
+                        !PortalPlacer.attemptPortalLight(
+                            world,
                             blockHit.getBlockPos().relative(blockHit.getDirection()),
-                            PortalIgnitionSource.ItemUseSource(item)))
+                            PortalIgnitionSource.ItemUseSource(item)
+                        )
+                    )
                         event.setCanceled(true);
                 }
             }

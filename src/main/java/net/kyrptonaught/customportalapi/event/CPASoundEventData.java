@@ -5,7 +5,11 @@ import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public record CPASoundEventData(SoundEvent sound, float pitch, float volume) {
+public record CPASoundEventData(
+    SoundEvent sound,
+    float pitch,
+    float volume
+) {
 
     @Contract(" -> new")
     public @NotNull SimpleSoundInstance getInstance() {

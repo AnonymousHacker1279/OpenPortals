@@ -1,7 +1,5 @@
 package net.kyrptonaught.customportalapi.util;
 
-import net.kyrptonaught.customportalapi.CustomPortalApiRegistry;
-import net.kyrptonaught.customportalapi.CustomPortalBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -12,7 +10,11 @@ import net.minecraft.world.level.block.EndPortalBlock;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
+import net.kyrptonaught.customportalapi.CustomPortalApiRegistry;
+import net.kyrptonaught.customportalapi.CustomPortalBlock;
+
 public class CustomPortalHelper {
+
     public static boolean isInstanceOfCustomPortal(Level world, BlockPos pos) {
         return isInstanceOfCustomPortal(world.getBlockState(pos));
     }

@@ -4,6 +4,7 @@ plugins {
     id 'net.neoforged.moddev' version "${neo_moddev}"
     id 'me.modmuss50.mod-publish-plugin' version "${modmuss50_mod_publish_version}"
     id 'org.moddedmc.wiki.toolkit' version '0.2.5'
+    id 'com.diffplug.spotless' version "7.0.0.BETA3"
 }
 
 import groovy.json.JsonOutput
@@ -159,4 +160,18 @@ if (file('key.properties').exists()) {
             minecraftVersions.add(project.minecraft_version)
         }
     }
+}
+
+spotless {
+    java {
+        eclipse().configFile("$rootDir/eclipse-formatter.xml")
+        endWithNewline()
+        importOrder("", "java", group.toString(), "\\#")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+    }
+}
+
+tasks.build {
+    dependsOn("spotlessApply")
 }

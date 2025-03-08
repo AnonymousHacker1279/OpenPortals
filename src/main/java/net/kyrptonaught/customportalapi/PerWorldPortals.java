@@ -1,6 +1,5 @@
 package net.kyrptonaught.customportalapi;
 
-import net.kyrptonaught.customportalapi.util.PortalLink;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
@@ -8,8 +7,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.kyrptonaught.customportalapi.util.PortalLink;
+
 public class PerWorldPortals {
+
     private static final Set<Block> worldPortals = ConcurrentHashMap.newKeySet();
+
+    private PerWorldPortals() {}
 
     public static void removeOldPortalsFromRegistry() {
         for (Block block : worldPortals)
