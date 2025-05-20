@@ -1,14 +1,18 @@
 package net.kyrptonaught.customportalapi;
 
+import net.kyrptonaught.customportalapi.portal.frame.PortalFrameTester;
+import net.kyrptonaught.customportalapi.util.CustomPortalHelper;
+import net.kyrptonaught.customportalapi.util.CustomTeleporter;
+import net.kyrptonaught.customportalapi.util.PortalLink;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.*;
@@ -19,39 +23,25 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import net.kyrptonaught.customportalapi.portal.frame.PortalFrameTester;
-import net.kyrptonaught.customportalapi.util.CustomPortalHelper;
-import net.kyrptonaught.customportalapi.util.CustomTeleporter;
-import net.kyrptonaught.customportalapi.util.PortalLink;
 
 public class CustomPortalBlock extends Block implements Portal {
 
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
-
     protected static final VoxelShape X_SHAPE = Block.box(0.0D, 0.0D, 6.0D, 16.0D, 16.0D, 10.0D);
-
     protected static final VoxelShape Z_SHAPE = Block.box(6.0D, 0.0D, 0.0D, 10.0D, 16.0D, 16.0D);
-
     protected static final VoxelShape Y_SHAPE = Block.box(0.0D, 6.0D, 0.0D, 16.0D, 10.0D, 16.0D);
 
-    public CustomPortalBlock(Properties settings) {
-        super(settings);
-        this.registerDefaultState(stateDefinition.any().setValue(AXIS, Direction.Axis.X));
+    public CustomPortalBlock(Properties properties) {
+        super(properties);
+        registerDefaultState(stateDefinition.any().setValue(AXIS, Direction.Axis.X));
     }
 
     @Override
-    public @NotNull VoxelShape getShape(
-        BlockState state,
-        @NotNull BlockGetter world,
-        @NotNull BlockPos pos,
-        @NotNull CollisionContext context
-    ) {
+    public VoxelShape getShape(BlockState state, BlockGetter getter, BlockPos pos, CollisionContext context) {
         return switch (state.getValue(AXIS)) {
             case Z -> Z_SHAPE;
             case Y -> Y_SHAPE;
@@ -60,33 +50,22 @@ public class CustomPortalBlock extends Block implements Portal {
     }
 
     @Override
-    public @NotNull ItemStack getCloneItemStack(@NotNull LevelReader world, @NotNull BlockPos pos, @NotNull BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public @NotNull BlockState updateShape(
-        @NotNull BlockState state,
-        @NotNull Direction direction,
-        @NotNull BlockState newState,
-        @NotNull LevelAccessor world,
-        @NotNull BlockPos pos,
-        @NotNull BlockPos posFrom
-    ) {
-        Block block = getPortalBase((Level) world, pos);
-        PortalLink link = CustomPortalApiRegistry.getPortalLinkFromBase(block);
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+        Block portalBase = getPortalBase((Level) level, pos);
+        PortalLink link = CustomPortalsMod.getPortalLinkFromBase(portalBase);
         if (link != null) {
             PortalFrameTester portalFrameTester = link.getFrameTester()
-                .createInstanceOfPortalFrameTester()
-                .init(
-                    world,
-                    pos,
-                    CustomPortalHelper.getAxisFrom(state),
-                    block
-                );
-            if (portalFrameTester.isAlreadyLitPortalFrame())
-                return super.updateShape(state, direction, newState, world, pos, posFrom);
+                    .init((LevelAccessor) level, pos, CustomPortalHelper.getAxisFrom(state), portalBase);
+            if (portalFrameTester.isAlreadyLitPortalFrame()) {
+                return super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
+            }
         }
+
         return Blocks.AIR.defaultBlockState();
     }
 
@@ -96,84 +75,80 @@ public class CustomPortalBlock extends Block implements Portal {
     }
 
     @Override
-    public void animateTick(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, RandomSource random) {
-        if (random.nextInt(100) == 0)
-            level.playLocalSound(
-                pos.getX() + 0.5D,
-                pos.getY() + 0.5D,
-                pos.getZ() + 0.5D,
-                SoundEvents.PORTAL_AMBIENT,
-                SoundSource.BLOCKS,
-                0.5F,
-                random.nextFloat() * 0.4F + 0.8F,
-                false
-            );
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        Block portalBase = getPortalBase(level, pos);
+        PortalLink link = CustomPortalsMod.getPortalLinkFromBase(portalBase);
 
-        for (int i = 0; i < 4; ++i) {
-            double d = pos.getX() + random.nextDouble();
-            double e = pos.getY() + random.nextDouble();
-            double f = pos.getZ() + random.nextDouble();
-            double g = (random.nextFloat() - 0.5D) * 0.5D;
-            double h = (random.nextFloat() - 0.5D) * 0.5D;
-            double j = (random.nextFloat() - 0.5D) * 0.5D;
-            int k = random.nextInt(2) * 2 - 1;
-            if (!level.getBlockState(pos.west()).is(this) && !level.getBlockState(pos.east()).is(this)) {
-                d = pos.getX() + 0.5D + 0.25D * k;
-                g = random.nextFloat() * 2.0F * k;
-            } else {
-                f = pos.getZ() + 0.5D + 0.25D * k;
-                j = random.nextFloat() * 2.0F * k;
+        if (link == null) {
+            return;
+        }
+
+        if (random.nextInt(100) == 0) {
+            SoundEvent event = BuiltInRegistries.SOUND_EVENT.getValue(link.ambientSoundLocation);
+            if (event != null) {
+                level.playLocalSound(
+                        pos.getX() + 0.5D,
+                        pos.getY() + 0.5D,
+                        pos.getZ() + 0.5D,
+                        event,
+                        SoundSource.BLOCKS,
+                        link.ambientSoundVolume.apply(level),
+                        link.ambientSoundPitch.apply(level),
+                        false
+                );
             }
-            level.addParticle(
-                new BlockParticleOption(
-                    ParticleTypes.BLOCK,
-                    getPortalBase(level, pos).defaultBlockState()
-                ),
-                d,
-                e,
-                f,
-                g,
-                h,
-                j
-            );
+        }
+
+        for (int i = 0; i < 4; i++) {
+            double dX = pos.getX() + random.nextDouble();
+            double dY = pos.getY() + random.nextDouble();
+            double dZ = pos.getZ() + random.nextDouble();
+            double sX = (random.nextFloat() - 0.5d) * 0.5d;
+            double sY = (random.nextFloat() - 0.5d) * 0.5d;
+            double sZ = (random.nextFloat() - 0.5d) * 0.5d;
+            int mod = random.nextInt(2) * 2 - 1;
+            if (!level.getBlockState(pos.west()).is(this) && !level.getBlockState(pos.east()).is(this)) {
+                dX = pos.getX() + 0.5f + 0.25f * mod;
+                sX = random.nextFloat() * 2.0f * mod;
+            } else {
+                dZ = pos.getZ() + 0.5f + 0.25f * mod;
+                sZ = random.nextFloat() * 2.0f * mod;
+            }
+
+            level.addParticle(link.portalParticle.apply(level, pos), dX, dY, dZ, sX, sY, sZ);
         }
     }
 
     @Override
-    public void entityInside(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier) {
         if (entity.canUsePortal(false)) {
             entity.setAsInsidePortal(this, pos);
         }
     }
 
     @Override
-    public int getPortalTransitionTime(@NotNull ServerLevel world, @NotNull Entity entity) {
+    public int getPortalTransitionTime(ServerLevel level, Entity entity) {
         if (entity instanceof Player playerEntity) {
-            return Math.max(
-                1,
-                world.getGameRules()
-                    .getInt(
-                        playerEntity.getAbilities().invulnerable
+            return Math.max(1, level.getGameRules().getInt(playerEntity.getAbilities().invulnerable
                             ? GameRules.RULE_PLAYERS_NETHER_PORTAL_CREATIVE_DELAY
-                            : GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY
-                    )
-            );
-        } else {
-            return 0;
+                            : GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY));
         }
+
+        return 0;
     }
 
-    public Block getPortalBase(Level world, BlockPos pos) {
-        return CustomPortalHelper.getPortalBaseDefault(world, pos);
-    }
-
-    @Override
-    public @Nullable DimensionTransition getPortalDestination(@NotNull ServerLevel world, @NotNull Entity entity, @NotNull BlockPos pos) {
-        return CustomTeleporter.createTeleportTarget(world, entity, getPortalBase(world, pos), pos);
+    public Block getPortalBase(Level level, BlockPos pos) {
+        return CustomPortalHelper.getPortalBaseDefault(level, pos);
     }
 
     @Override
-    public @NotNull Transition getLocalTransition() {
+    @Nullable
+    public TeleportTransition getPortalDestination(ServerLevel level, Entity entity, BlockPos pos) {
+        return CustomTeleporter.createTeleportTarget(level, entity, getPortalBase(level, pos), pos);
+    }
+
+    @Override
+    public Transition getLocalTransition() {
         return Transition.CONFUSION;
     }
 }

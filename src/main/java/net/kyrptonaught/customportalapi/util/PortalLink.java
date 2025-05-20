@@ -1,102 +1,131 @@
 package net.kyrptonaught.customportalapi.util;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import net.kyrptonaught.customportalapi.CustomPortalApiRegistry;
 import net.kyrptonaught.customportalapi.CustomPortalBlock;
 import net.kyrptonaught.customportalapi.CustomPortalsMod;
-import net.kyrptonaught.customportalapi.event.CPAEvent;
-import net.kyrptonaught.customportalapi.event.CPASoundEventData;
+import net.kyrptonaught.customportalapi.network.PlayerSoundPayload;
 import net.kyrptonaught.customportalapi.portal.PortalIgnitionSource;
 import net.kyrptonaught.customportalapi.portal.frame.PortalFrameTester;
+import net.kyrptonaught.customportalapi.portal.frame.VanillaPortalFrameTester;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class PortalLink {
 
-    public ResourceLocation block;
+    @Nullable
+    private Block frameBlock;
+    public PortalIgnitionSource ignitionSource = PortalIgnitionSource.FIRE;
+    public CustomPortalBlock portalBlock = CustomPortalsMod.CUSTOM_PORTAL_BLOCK.get();
+    public ResourceLocation targetDimensionLocation = ResourceLocation.withDefaultNamespace("nether");
+    public ResourceLocation returnDimensionLocation = ResourceLocation.withDefaultNamespace("overworld");
+    public boolean onlyIgnitableInReturnDimension = false;
+    public int color;
+    public int strictWidth, strictHeight;
+    public int portalSearchYBottom, portalSearchYTop = Integer.MIN_VALUE;
+    public int returnPortalSearchYBottom, returnPortalSearchYTop = Integer.MIN_VALUE;
+    public PortalFrameTester portalFrameTester = new VanillaPortalFrameTester();
+    private Consumer<Entity> postTeleportEvent = entity -> {};
+    private Function<Entity, Boolean> preTeleportEvent = entity -> true;
+    @Nullable
+    private ResourceLocation travelSoundLocation = BuiltInRegistries.SOUND_EVENT.getKeyOrNull(SoundEvents.PORTAL_TRAVEL);
+    private Function<Entity, Float> travelSoundVolume = (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F;
+    private Function<Entity, Float> travelSoundPitch = (entity) -> 0.25f;
+    @Nullable
+    public ResourceLocation triggerSoundLocation = BuiltInRegistries.SOUND_EVENT.getKeyOrNull(SoundEvents.PORTAL_TRIGGER);
+    public Function<Entity, Float> triggerSoundVolume = (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F;
+    public Function<Entity, Float> triggerSoundPitch = (entity) -> 0.25f;
+    @Nullable
+    public ResourceLocation ambientSoundLocation = BuiltInRegistries.SOUND_EVENT.getKeyOrNull(SoundEvents.PORTAL_AMBIENT);
+    public Function<Level, Float> ambientSoundVolume = (level) -> 0.5f;
+    public Function<Level, Float> ambientSoundPitch = (level) -> level.random.nextFloat() * 0.4F + 0.8F;
+    public BiFunction<Level, BlockPos, ParticleOptions> portalParticle = (level, pos) -> new BlockParticleOption(ParticleTypes.BLOCK,
+            CustomPortalHelper.getPortalBaseDefault(level, pos).defaultBlockState());
 
-    public PortalIgnitionSource portalIgnitionSource = PortalIgnitionSource.FIRE;
+    public Block getFrameBlock() {
+        if (frameBlock == null) {
+            throw new IllegalStateException("Frame block is not set!");
+        }
 
-    private Supplier<CustomPortalBlock> portalBlock = CustomPortalsMod.portalBlock;
-
-    public ResourceLocation dimID;
-
-    public ResourceLocation returnDimID = ResourceLocation.withDefaultNamespace("overworld");
-
-    public boolean onlyIgnitableInReturnDim = false;
-
-    public int colorID;
-
-    public int forcedWidth, forcedHeight;
-
-    public Integer portalSearchYBottom, portalSearchYTop;
-
-    public Integer returnPortalSearchYBottom, returnPortalSearchYTop;
-
-    public ResourceLocation portalFrameTester = CustomPortalsMod.VANILLAPORTAL_FRAMETESTER;
-
-    private Consumer<Entity> postTPEvent;
-
-    private final CPAEvent<Entity, SHOULDTP> beforeTPEvent = new CPAEvent<>(SHOULDTP.CONTINUE_TP);
-
-    private final CPAEvent<Player, CPASoundEventData> inPortalAmbienceEvent = new CPAEvent<>();
-
-    private final CPAEvent<Player, CPASoundEventData> postTpPortalAmbienceEvent = new CPAEvent<>();
-
-    public PortalLink() {}
-
-    public PortalLink(ResourceLocation blockID, ResourceLocation dimID, int colorID) {
-        this.block = blockID;
-        this.dimID = dimID;
-        this.colorID = colorID;
+        return frameBlock;
     }
 
-    public CustomPortalBlock getPortalBlock() {
-        return portalBlock.get();
-    }
-
-    public void setPortalBlock(Supplier<CustomPortalBlock> block) {
-        this.portalBlock = block;
+    public void setFrameBlock(Block frameBlock) {
+        this.frameBlock = frameBlock;
     }
 
     public boolean doesIgnitionMatch(PortalIgnitionSource attemptedSource) {
-        return portalIgnitionSource.sourceType == attemptedSource.sourceType && portalIgnitionSource.ignitionSourceID.equals(
-            attemptedSource.ignitionSourceID
-        );
+        return ignitionSource.sourceType == attemptedSource.sourceType && ignitionSource.ignitionSourceID.equals(attemptedSource.ignitionSourceID);
     }
 
     public boolean canLightInDim(ResourceLocation dim) {
-        if (!onlyIgnitableInReturnDim)
+        if (!onlyIgnitableInReturnDimension) {
             return true;
-        return dim.equals(returnDimID) || dim.equals(dimID);
+        }
+
+        return dim.equals(returnDimensionLocation) || dim.equals(targetDimensionLocation);
     }
 
-    public CPAEvent<Entity, SHOULDTP> getBeforeTPEvent() {
-        return beforeTPEvent;
+    public Function<Entity, Boolean> getPreTeleportEvent() {
+        return preTeleportEvent;
     }
 
-    public CPAEvent<Player, CPASoundEventData> getInPortalAmbienceEvent() {
-        return inPortalAmbienceEvent;
+    /**
+     * Set the pre-teleport event.
+     *
+     * @param event A function that accepts an entity and returns a boolean
+     */
+    public void setPreTeleportEvent(Function<Entity, Boolean> event) {
+        preTeleportEvent = event;
     }
 
-    public CPAEvent<Player, CPASoundEventData> getPostTpPortalAmbienceEvent() {
-        return postTpPortalAmbienceEvent;
+    public void setPostTeleportEvent(Consumer<Entity> event) {
+        postTeleportEvent = event;
     }
 
-    public void setPostTPEvent(Consumer<Entity> event) {
-        postTPEvent = event;
+    public void executePostTeleportEvent(Entity entity) {
+        postTeleportEvent.accept(entity);
     }
 
-    public void executePostTPEvent(Entity entity) {
-        if (postTPEvent != null)
-            postTPEvent.accept(entity);
+    public void setTravelSound(ResourceLocation travelSoundLocation, Function<Entity, Float> travelSoundVolume, Function<Entity, Float> travelSoundPitch) {
+        this.travelSoundLocation = travelSoundLocation;
+        this.travelSoundVolume = travelSoundVolume;
+        this.travelSoundPitch = travelSoundPitch;
     }
 
-    public PortalFrameTester.PortalFrameTesterFactory getFrameTester() {
-        return CustomPortalApiRegistry.getPortalFrameTester(portalFrameTester);
+    public void playTravelSound(Entity entity) {
+        if (entity instanceof ServerPlayer player && travelSoundLocation != null) {
+            PacketDistributor.sendToPlayer(player,
+                    new PlayerSoundPayload(travelSoundLocation, travelSoundVolume.apply(entity), travelSoundPitch.apply(entity)));
+        }
+    }
+
+    public void setTriggerSound(ResourceLocation triggerSoundLocation, Function<Entity, Float> triggerSoundVolume, Function<Entity, Float> triggerSoundPitch) {
+        this.triggerSoundLocation = triggerSoundLocation;
+        this.triggerSoundVolume = triggerSoundVolume;
+        this.triggerSoundPitch = triggerSoundPitch;
+    }
+
+    public void setAmbientSound(ResourceLocation ambientSoundLocation, Function<Level, Float> ambientSoundVolume, Function<Level, Float> ambientSoundPitch) {
+        this.ambientSoundLocation = ambientSoundLocation;
+        this.ambientSoundVolume = ambientSoundVolume;
+        this.ambientSoundPitch = ambientSoundPitch;
+    }
+
+    public PortalFrameTester getFrameTester() {
+        return portalFrameTester;
     }
 }

@@ -1,14 +1,15 @@
 package net.kyrptonaught.customportalapi.mixin.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import net.kyrptonaught.customportalapi.CustomPortalBlock;
+import net.kyrptonaught.customportalapi.CustomPortalsMod;
+import net.kyrptonaught.customportalapi.util.PortalLink;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.PortalProcessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Portal;
@@ -22,11 +23,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import net.kyrptonaught.customportalapi.CustomPortalApiRegistry;
-import net.kyrptonaught.customportalapi.CustomPortalBlock;
-import net.kyrptonaught.customportalapi.CustomPortalsMod;
-import net.kyrptonaught.customportalapi.util.PortalLink;
-
 @OnlyIn(Dist.CLIENT)
 @Mixin(Gui.class)
 public class InGameHudMixin {
@@ -36,20 +32,18 @@ public class InGameHudMixin {
     private Minecraft minecraft;
 
     @Unique
-    private int lastColor = -1;
+    private int customportalapi_reforged$lastColor = -1;
 
-    @Redirect(
-        method = "renderPortalOverlay", at = @At(
-            value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;setColor(FFFF)V", ordinal = 0
-        )
-    )
-    public void changeColor(GuiGraphics instance, float red, float green, float blue, float alpha) {
-        isCustomPortal(minecraft.player);
-        if (lastColor >= 0) {
-            FastColor.ABGR32.color(FastColor.as8BitChannel(alpha), lastColor);
-        } else {
-            RenderSystem.setShaderColor(red, green, blue, alpha);
+    @ModifyExpressionValue(method = "renderPortalOverlay", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/util/ARGB;white(F)I"))
+    public int changeColor(int original) {
+        if (minecraft.player == null) {
+            return original;
         }
+
+        customportalapi_reforged$isCustomPortal(minecraft.player);
+        return customportalapi_reforged$lastColor >= 0 ? customportalapi_reforged$lastColor : original;
     }
 
     @Redirect(
@@ -59,22 +53,19 @@ public class InGameHudMixin {
         )
     )
     public TextureAtlasSprite renderCustomPortalOverlay(BlockModelShaper blockModels, BlockState blockState) {
-        if (lastColor >= 0) {
+        if (customportalapi_reforged$lastColor >= 0) {
             return this.minecraft.getBlockRenderer()
                 .getBlockModelShaper()
-                .getParticleIcon(
-                    CustomPortalsMod.portalBlock.get().defaultBlockState()
-                );
+                .getParticleIcon(CustomPortalsMod.CUSTOM_PORTAL_BLOCK.get().defaultBlockState());
         }
+
         return this.minecraft.getBlockRenderer()
             .getBlockModelShaper()
-            .getParticleIcon(
-                Blocks.NETHER_PORTAL.defaultBlockState()
-            );
+            .getParticleIcon(Blocks.NETHER_PORTAL.defaultBlockState());
     }
 
     @Unique
-    private void isCustomPortal(LocalPlayer player) {
+    private void customportalapi_reforged$isCustomPortal(LocalPlayer player) {
         PortalProcessor portalManager = player.portalProcess;
         Portal portalBlock = portalManager != null && portalManager.isInsidePortalThisTick()
             ? ((PortalManagerAccessor) portalManager).getPortal()
@@ -87,14 +78,14 @@ public class InGameHudMixin {
             return;
         }
 
-        if (portalBlock instanceof CustomPortalBlock customportalblock) {
-            PortalLink link = CustomPortalApiRegistry.getPortalLinkFromBase(customportalblock.getPortalBase(player.clientLevel, portalPos));
+        if (portalBlock instanceof CustomPortalBlock customportalblock && portalPos != null) {
+            PortalLink link = CustomPortalsMod.getPortalLinkFromBase(customportalblock.getPortalBase(player.clientLevel, portalPos));
             if (link != null) {
-                lastColor = link.colorID;
+                customportalapi_reforged$lastColor = link.color;
                 return;
             }
         }
 
-        lastColor = -1;
+        customportalapi_reforged$lastColor = -1;
     }
 }
