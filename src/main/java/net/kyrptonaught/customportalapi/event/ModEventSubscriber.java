@@ -12,7 +12,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforgespi.language.IModInfo;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 
-@EventBusSubscriber(modid = CustomPortalsMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = CustomPortalsMod.MOD_ID)
 public class ModEventSubscriber {
 
 	@SubscribeEvent
