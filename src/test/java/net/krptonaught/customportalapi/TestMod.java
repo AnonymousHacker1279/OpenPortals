@@ -12,7 +12,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = CustomPortalsMod.MOD_ID)
+@EventBusSubscriber(modid = CustomPortalsMod.MOD_ID)
 public class TestMod {
 
 	@SubscribeEvent

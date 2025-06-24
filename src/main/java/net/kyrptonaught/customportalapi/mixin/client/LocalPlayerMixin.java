@@ -21,7 +21,7 @@ public class LocalPlayerMixin {
 
 	@ModifyArg(method = "handlePortalTransitionEffect", at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+			target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)Lnet/minecraft/client/sounds/SoundEngine$PlayResult;"))
 	public SoundInstance playSound(SoundInstance original) {
 		SoundInstance triggerSound = customportalapi_reforged$getTriggerSound((LocalPlayer) (Object) this);
 		if (triggerSound != null) {
