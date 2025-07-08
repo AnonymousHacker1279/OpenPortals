@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -199,6 +200,27 @@ public class CustomPortalBuilder {
      */
     public CustomPortalBuilder postTeleportEvent(Consumer<Entity> event) {
         portalLink.setPostTeleportEvent(event);
+        return this;
+    }
+
+    /**
+     * Register an event to be called immediately before the portal is ignited. Returning false will prevent the portal
+     * from igniting.
+     *
+     * @param event A function that accepts a BlockPos and PortalIgnitionSource, returning a boolean
+     */
+    public CustomPortalBuilder prePortalIgniteEvent(BiFunction<BlockPos, PortalIgnitionSource, Boolean> event) {
+        portalLink.setPrePortalIgniteEvent(event);
+        return this;
+    }
+
+    /**
+     * Register an event to be called after the portal is ignited.
+     *
+     * @param event A consumer that accepts a BlockPos and PortalIgnitionSource
+     */
+    public CustomPortalBuilder postPortalIgniteEvent(BiConsumer<BlockPos, PortalIgnitionSource> event) {
+        portalLink.setPostPortalIgniteEvent(event);
         return this;
     }
 

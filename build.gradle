@@ -81,6 +81,16 @@ tasks.withType(ProcessResources).configureEach {
     }
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
 tasks.named('jar', Jar).configure {
     manifest {
         attributes(['Specification-Title'     : mod_id,
@@ -128,6 +138,8 @@ publishing {
         maven(MavenPublication) {
             artifactId base.archivesName.get()
             artifact jar
+            artifact sourcesJar
+            artifact javadocJar
         }
     }
 }

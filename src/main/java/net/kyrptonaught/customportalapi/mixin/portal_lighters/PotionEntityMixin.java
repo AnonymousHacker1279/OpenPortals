@@ -1,7 +1,7 @@
 package net.kyrptonaught.customportalapi.mixin.portal_lighters;
 
+import net.kyrptonaught.customportalapi.portal.PortalIgniter;
 import net.kyrptonaught.customportalapi.portal.PortalIgnitionSource;
-import net.kyrptonaught.customportalapi.portal.PortalPlacer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.AbstractThrownPotion;
@@ -21,6 +21,6 @@ public abstract class PotionEntityMixin extends ThrowableItemProjectile {
 
     @Inject(method = "dowseFire", at = @At("HEAD"))
     public void attemptPortalLight(BlockPos pos, CallbackInfo ci) {
-        PortalPlacer.attemptPortalLight(this.level(), pos, PortalIgnitionSource.WATER);
+        PortalIgniter.attemptPortalLight(this.level(), pos, PortalIgnitionSource.WATER);
     }
 }

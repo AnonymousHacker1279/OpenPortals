@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -40,6 +41,8 @@ public class PortalLink {
     public PortalFrameTester portalFrameTester = new VanillaPortalFrameTester();
     private Consumer<Entity> postTeleportEvent = entity -> {};
     private Function<Entity, Boolean> preTeleportEvent = entity -> true;
+    private BiFunction<BlockPos, PortalIgnitionSource, Boolean> prePortalIgniteEvent = (portalPos, source) -> true;
+    private BiConsumer<BlockPos, PortalIgnitionSource> postPortalIgniteEvent = (portalPos, source) -> {};
     @Nullable
     private ResourceLocation travelSoundLocation = BuiltInRegistries.SOUND_EVENT.getKeyOrNull(SoundEvents.PORTAL_TRAVEL);
     private Function<Entity, Float> travelSoundVolume = (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F;
@@ -83,11 +86,6 @@ public class PortalLink {
         return preTeleportEvent;
     }
 
-    /**
-     * Set the pre-teleport event.
-     *
-     * @param event A function that accepts an entity and returns a boolean
-     */
     public void setPreTeleportEvent(Function<Entity, Boolean> event) {
         preTeleportEvent = event;
     }
@@ -98,6 +96,22 @@ public class PortalLink {
 
     public void executePostTeleportEvent(Entity entity) {
         postTeleportEvent.accept(entity);
+    }
+
+    public BiFunction<BlockPos, PortalIgnitionSource, Boolean> getPrePortalIgniteEvent() {
+        return prePortalIgniteEvent;
+    }
+
+    public void setPrePortalIgniteEvent(BiFunction<BlockPos, PortalIgnitionSource, Boolean> event) {
+        prePortalIgniteEvent = event;
+    }
+
+    public BiConsumer<BlockPos, PortalIgnitionSource> getPostPortalIgniteEvent() {
+        return postPortalIgniteEvent;
+    }
+
+    public void setPostPortalIgniteEvent(BiConsumer<BlockPos, PortalIgnitionSource> event) {
+        postPortalIgniteEvent = event;
     }
 
     public void setTravelSound(ResourceLocation travelSoundLocation, Function<Entity, Float> travelSoundVolume, Function<Entity, Float> travelSoundPitch) {

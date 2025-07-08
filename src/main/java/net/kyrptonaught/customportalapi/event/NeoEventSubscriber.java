@@ -1,8 +1,8 @@
 package net.kyrptonaught.customportalapi.event;
 
 import net.kyrptonaught.customportalapi.CustomPortalsMod;
+import net.kyrptonaught.customportalapi.portal.PortalIgniter;
 import net.kyrptonaught.customportalapi.portal.PortalIgnitionSource;
-import net.kyrptonaught.customportalapi.portal.PortalPlacer;
 import net.kyrptonaught.customportalapi.portal.linking.PortalLinkingStorage;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
@@ -45,8 +45,9 @@ public class NeoEventSubscriber {
 				HitResult hit = player.pick(6, 1, false);
 				if (hit.getType() == HitResult.Type.BLOCK) {
 					BlockHitResult blockHit = (BlockHitResult) hit;
-					if (!PortalPlacer.attemptPortalLight(level, blockHit.getBlockPos().relative(blockHit.getDirection()), PortalIgnitionSource.fromItem(item)))
+					if (PortalIgniter.attemptPortalLight(level, blockHit.getBlockPos().relative(blockHit.getDirection()), PortalIgnitionSource.fromItem(item).withPlayer(player))) {
 						event.setCanceled(true);
+					}
 				}
 			}
 		}

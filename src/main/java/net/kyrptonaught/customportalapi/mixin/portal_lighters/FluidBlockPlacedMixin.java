@@ -1,7 +1,7 @@
 package net.kyrptonaught.customportalapi.mixin.portal_lighters;
 
+import net.kyrptonaught.customportalapi.portal.PortalIgniter;
 import net.kyrptonaught.customportalapi.portal.PortalIgnitionSource;
-import net.kyrptonaught.customportalapi.portal.PortalPlacer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -24,7 +24,7 @@ public abstract class FluidBlockPlacedMixin {
         CallbackInfo ci
     ) {
         if (state.getFluidState().isSource())
-            PortalPlacer.attemptPortalLight(
+            PortalIgniter.attemptPortalLight(
                 world,
                 pos,
                 PortalIgnitionSource.fromFluid(state.getFluidState().getType())
