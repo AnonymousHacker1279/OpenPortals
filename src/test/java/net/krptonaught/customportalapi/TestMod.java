@@ -6,6 +6,7 @@ import net.kyrptonaught.customportalapi.api.CustomPortalBuilder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
@@ -33,6 +34,8 @@ public class TestMod {
 				.tintColor(0, 255, 255)
 				.preTeleportEvent(entity -> entity.getWeaponItem() != null && !entity.getWeaponItem().is(Items.NETHERITE_BLOCK))
 				.postTeleportEvent(entity -> CustomPortalsMod.LOGGER.info("Teleported entity: {}", entity.getName().getString()))
+				.prePortalIgniteEvent((pos, source) -> source.player != null && !source.player.getInventory().contains(ItemTags.AXES))
+				.postPortalIgniteEvent((pos, source) -> CustomPortalsMod.LOGGER.info("Portal ignited at position: {}", pos))
 				.travelSound(SoundEvents.LIGHTNING_BOLT_THUNDER.location(), (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F, (entity) -> 1.0f)
 				.triggerSound(SoundEvents.WATER_AMBIENT.location(), (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F, (entity) -> 1.0f)
 				.ambientSound(SoundEvents.AMETHYST_BLOCK_CHIME.location(), (level -> 1.0f), (level) -> level.random.nextFloat() * 0.4F + 0.8F)

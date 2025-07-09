@@ -144,7 +144,7 @@ public class CustomPortalBlock extends Block implements Portal {
     @Override
     @Nullable
     public TeleportTransition getPortalDestination(ServerLevel level, Entity entity, BlockPos pos) {
-        return CustomTeleporter.createTeleportTarget(level, entity, getPortalBase(level, pos), pos);
+        return CustomTeleporter.attemptTeleport(level, entity, getPortalBase(level, pos), pos);
     }
 
     @Override

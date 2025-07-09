@@ -3,10 +3,12 @@ package net.kyrptonaught.customportalapi.portal;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -17,7 +19,6 @@ public class PortalIgnitionSource {
         SourceType.BLOCK_PLACED,
         BuiltInRegistries.BLOCK.getKey(Blocks.FIRE)
     );
-
     public static final PortalIgnitionSource WATER = fromFluid(Fluids.WATER);
 
     public enum SourceType {
@@ -28,10 +29,10 @@ public class PortalIgnitionSource {
     }
 
     private static final HashSet<Item> USE_ITEMS = new HashSet<>();
-
     public final SourceType sourceType;
-
     public final ResourceLocation ignitionSourceID;
+    @Nullable
+    public Player player;
 
     private PortalIgnitionSource(SourceType sourceType, ResourceLocation ignitionSourceID) {
         this.sourceType = sourceType;
@@ -53,6 +54,11 @@ public class PortalIgnitionSource {
 
     public static boolean isRegisteredIgnitionSourceWith(Item item) {
         return USE_ITEMS.contains(item);
+    }
+
+    public PortalIgnitionSource withPlayer(Player player) {
+        this.player = player;
+        return this;
     }
 
     public boolean isWater() {

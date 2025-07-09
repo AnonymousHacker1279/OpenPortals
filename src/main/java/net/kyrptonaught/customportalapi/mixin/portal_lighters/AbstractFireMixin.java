@@ -1,7 +1,7 @@
 package net.kyrptonaught.customportalapi.mixin.portal_lighters;
 
+import net.kyrptonaught.customportalapi.portal.PortalIgniter;
 import net.kyrptonaught.customportalapi.portal.PortalIgnitionSource;
-import net.kyrptonaught.customportalapi.portal.PortalPlacer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
@@ -16,7 +16,7 @@ public class AbstractFireMixin {
 
     @Inject(method = "onPlace", at = @At("HEAD"), cancellable = true)
     public void detectCustomPortal(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify, CallbackInfo ci) {
-        if (PortalPlacer.attemptPortalLight(world, pos, PortalIgnitionSource.FIRE))
+        if (PortalIgniter.attemptPortalLight(world, pos, PortalIgnitionSource.FIRE))
             ci.cancel();
     }
 }
