@@ -1,11 +1,5 @@
 package net.kyrptonaught.customportalapi.api;
 
-import net.kyrptonaught.customportalapi.CustomPortalBlock;
-import net.kyrptonaught.customportalapi.CustomPortalsMod;
-import net.kyrptonaught.customportalapi.portal.PortalIgnitionSource;
-import net.kyrptonaught.customportalapi.portal.frame.FlatPortalFrameTester;
-import net.kyrptonaught.customportalapi.portal.frame.PortalFrameTester;
-import net.kyrptonaught.customportalapi.util.PortalLink;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,8 +15,16 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import net.kyrptonaught.customportalapi.CustomPortalBlock;
+import net.kyrptonaught.customportalapi.CustomPortalsMod;
+import net.kyrptonaught.customportalapi.portal.PortalIgnitionSource;
+import net.kyrptonaught.customportalapi.portal.frame.FlatPortalFrameTester;
+import net.kyrptonaught.customportalapi.portal.frame.PortalFrameTester;
+import net.kyrptonaught.customportalapi.util.PortalLink;
+
 @SuppressWarnings("unused")
 public class CustomPortalBuilder {
+
     private final PortalLink portalLink;
 
     public CustomPortalBuilder() {
@@ -30,8 +32,8 @@ public class CustomPortalBuilder {
     }
 
     /**
-     * Register the portal when completed.
-     * This should be called last, only when you are finished configuring the portal.
+     * Register the portal when completed. This should be called last, only when you are finished configuring the
+     * portal.
      */
     public void build() {
         CustomPortalsMod.addPortal(portalLink.getFrameBlock(), portalLink);
@@ -106,8 +108,7 @@ public class CustomPortalBuilder {
     }
 
     /**
-     * Specify a custom ignition source to ignite the portal.
-     * You must manually trigger the ignition yourself.
+     * Specify a custom ignition source to ignite the portal. You must manually trigger the ignition yourself.
      */
     public CustomPortalBuilder customIgnitionSource(ResourceLocation customSourceLocation) {
         portalLink.ignitionSource = PortalIgnitionSource.fromCustomSource(customSourceLocation);
@@ -115,8 +116,7 @@ public class CustomPortalBuilder {
     }
 
     /**
-     * Specify a custom ignition source to ignite the portal.
-     * You must manually trigger the ignition yourself.
+     * Specify a custom ignition source to ignite the portal. You must manually trigger the ignition yourself.
      */
     public CustomPortalBuilder customIgnitionSource(PortalIgnitionSource ignitionSource) {
         portalLink.ignitionSource = ignitionSource;
@@ -146,7 +146,7 @@ public class CustomPortalBuilder {
     /**
      * Specify the dimension this portal will return you to.
      *
-     * @param returnDimensionLocation ResourceLocation of the dimension the portal will return you to
+     * @param returnDimensionLocation        ResourceLocation of the dimension the portal will return you to
      * @param onlyIgnitableInReturnDimension Whether the portal can only be ignited in the return dimension
      */
     public CustomPortalBuilder returnDimension(ResourceLocation returnDimensionLocation, boolean onlyIgnitableInReturnDimension) {
@@ -156,8 +156,8 @@ public class CustomPortalBuilder {
     }
 
     /**
-     * Specify that this portal can only be ignited in the overworld.
-     * Attempting to light it in other dimensions will fail.
+     * Specify that this portal can only be ignited in the overworld. Attempting to light it in other dimensions will
+     * fail.
      */
     public CustomPortalBuilder onlyLightInOverworld() {
         portalLink.onlyIgnitableInReturnDimension = true;
@@ -183,8 +183,8 @@ public class CustomPortalBuilder {
     }
 
     /**
-     * Register an event to be called immediately before the specified entity is teleported.
-     * Returning true will allow the teleportation to continue, while returning false will cancel it.
+     * Register an event to be called immediately before the specified entity is teleported. Returning true will allow
+     * the teleportation to continue, while returning false will cancel it.
      *
      * @param event A function that accepts an entity and returns a boolean
      */
@@ -229,10 +229,14 @@ public class CustomPortalBuilder {
      * to allow for dynamic values.
      *
      * @param travelSoundLocation ResourceLocation of the sound to be played
-     * @param travelSoundVolume Volume of the sound
-     * @param travelSoundPitch Pitch of the sound
+     * @param travelSoundVolume   Volume of the sound
+     * @param travelSoundPitch    Pitch of the sound
      */
-    public CustomPortalBuilder travelSound(ResourceLocation travelSoundLocation, Function<Entity, Float> travelSoundVolume, Function<Entity, Float> travelSoundPitch) {
+    public CustomPortalBuilder travelSound(
+        ResourceLocation travelSoundLocation,
+        Function<Entity, Float> travelSoundVolume,
+        Function<Entity, Float> travelSoundPitch
+    ) {
         portalLink.setTravelSound(travelSoundLocation, travelSoundVolume, travelSoundPitch);
         return this;
     }
@@ -242,10 +246,14 @@ public class CustomPortalBuilder {
      * to allow for dynamic values.
      *
      * @param triggerSoundLocation ResourceLocation of the sound to be played
-     * @param triggerSoundVolume Volume of the sound
-     * @param triggerSoundPitch Pitch of the sound
+     * @param triggerSoundVolume   Volume of the sound
+     * @param triggerSoundPitch    Pitch of the sound
      */
-    public CustomPortalBuilder triggerSound(ResourceLocation triggerSoundLocation, Function<Entity, Float> triggerSoundVolume, Function<Entity, Float> triggerSoundPitch) {
+    public CustomPortalBuilder triggerSound(
+        ResourceLocation triggerSoundLocation,
+        Function<Entity, Float> triggerSoundVolume,
+        Function<Entity, Float> triggerSoundPitch
+    ) {
         portalLink.setTriggerSound(triggerSoundLocation, triggerSoundVolume, triggerSoundPitch);
         return this;
     }
@@ -254,10 +262,14 @@ public class CustomPortalBuilder {
      * Set the sound to be played randomly while nearby the portal.
      *
      * @param ambientSoundLocation ResourceLocation of the sound to be played
-     * @param ambientSoundVolume Volume of the sound
-     * @param ambientSoundPitch Pitch of the sound
+     * @param ambientSoundVolume   Volume of the sound
+     * @param ambientSoundPitch    Pitch of the sound
      */
-    public CustomPortalBuilder ambientSound(ResourceLocation ambientSoundLocation, Function<Level, Float> ambientSoundVolume, Function<Level, Float> ambientSoundPitch) {
+    public CustomPortalBuilder ambientSound(
+        ResourceLocation ambientSoundLocation,
+        Function<Level, Float> ambientSoundVolume,
+        Function<Level, Float> ambientSoundPitch
+    ) {
         portalLink.setAmbientSound(ambientSoundLocation, ambientSoundVolume, ambientSoundPitch);
         return this;
     }

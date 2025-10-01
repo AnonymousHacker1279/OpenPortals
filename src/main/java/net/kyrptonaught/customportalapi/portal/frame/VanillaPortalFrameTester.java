@@ -1,9 +1,6 @@
 package net.kyrptonaught.customportalapi.portal.frame;
 
 import com.google.common.collect.Sets;
-import net.kyrptonaught.customportalapi.CustomPortalsMod;
-import net.kyrptonaught.customportalapi.util.CustomPortalHelper;
-import net.kyrptonaught.customportalapi.util.PortalLink;
 import net.minecraft.BlockUtil;
 import net.minecraft.BlockUtil.FoundRectangle;
 import net.minecraft.core.BlockPos;
@@ -25,12 +22,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import net.kyrptonaught.customportalapi.CustomPortalsMod;
+import net.kyrptonaught.customportalapi.util.CustomPortalHelper;
+import net.kyrptonaught.customportalapi.util.PortalLink;
+
 public class VanillaPortalFrameTester extends PortalFrameTester {
 
     protected final int maxWidth = 21;
+
     protected final int maxHeight = 21;
+
     protected Direction.Axis portalAxis = Direction.Axis.X;
+
     protected int height;
+
     protected int width;
 
     public PortalFrameTester init(LevelAccessor level, BlockPos blockPos, Direction.Axis axis, Block... foundations) {
@@ -69,21 +74,37 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
     }
 
     public Optional<PortalFrameTester> getNewPortal(LevelAccessor level, BlockPos blockPos, Direction.Axis axis, Block... foundations) {
-        return getOrEmpty(level, blockPos, customAreaHelper -> customAreaHelper.isValidFrame() && customAreaHelper.foundPortalBlocks == 0, axis, foundations);
+        return getOrEmpty(
+            level,
+            blockPos,
+            customAreaHelper -> customAreaHelper.isValidFrame() && customAreaHelper.foundPortalBlocks == 0,
+            axis,
+            foundations
+        );
     }
 
-    public Optional<PortalFrameTester> getOrEmpty(LevelAccessor level, BlockPos blockPos, Predicate<PortalFrameTester> predicate, Direction.Axis axis, Block... foundations) {
-        Optional<PortalFrameTester> optional = Optional.of(new VanillaPortalFrameTester()
-                .init(level, blockPos, axis, foundations))
-                .filter(predicate);
+    public Optional<PortalFrameTester> getOrEmpty(
+        LevelAccessor level,
+        BlockPos blockPos,
+        Predicate<PortalFrameTester> predicate,
+        Direction.Axis axis,
+        Block... foundations
+    ) {
+        Optional<PortalFrameTester> optional = Optional.of(
+            new VanillaPortalFrameTester()
+                .init(level, blockPos, axis, foundations)
+        )
+            .filter(predicate);
 
         if (optional.isPresent()) {
             return optional;
         } else {
             Direction.Axis axis2 = axis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
-            return Optional.of(new VanillaPortalFrameTester()
-                    .init(level, blockPos, axis2, foundations))
-                    .filter(predicate);
+            return Optional.of(
+                new VanillaPortalFrameTester()
+                    .init(level, blockPos, axis2, foundations)
+            )
+                .filter(predicate);
         }
     }
 
@@ -103,14 +124,16 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
     @Override
     @Nullable
     public BlockPos doesPortalFitAt(Level level, BlockPos attemptPos, Direction.Axis axis) {
-        if (isEmptySpace(level.getBlockState(attemptPos))
+        if (
+            isEmptySpace(level.getBlockState(attemptPos))
                 && isEmptySpace(level.getBlockState(attemptPos.relative(axis, 1)))
                 && isEmptySpace(level.getBlockState(attemptPos.above()))
                 && isEmptySpace(level.getBlockState(attemptPos.relative(axis, 1).above()))
                 && isEmptySpace(level.getBlockState(attemptPos.above(2)))
                 && isEmptySpace(level.getBlockState(attemptPos.relative(axis, 1).above(2)))
                 && canHoldPortal(level, attemptPos.below())
-                && canHoldPortal(level, attemptPos.relative(axis, 1).below())) {
+                && canHoldPortal(level, attemptPos.relative(axis, 1).below())
+        ) {
             return attemptPos;
         }
 
@@ -140,7 +163,14 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
     }
 
     @Override
-    public TeleportTransition getTPTargetInPortal(ServerLevel serverLevel, FoundRectangle portalRect, Axis portalAxis, Vec3 prevOffset, Entity entity, PortalLink link) {
+    public TeleportTransition getTPTargetInPortal(
+        ServerLevel serverLevel,
+        FoundRectangle portalRect,
+        Axis portalAxis,
+        Vec3 prevOffset,
+        Entity entity,
+        PortalLink link
+    ) {
         EntityDimensions entityDimensions = entity.getDimensions(entity.getPose());
         double width = portalRect.axis1Size - entityDimensions.width();
         double height = portalRect.axis2Size - entityDimensions.height();
@@ -149,8 +179,7 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
         double z = Mth.lerp(prevOffset.z, portalRect.minCorner.getZ(), portalRect.minCorner.getZ() + width);
         if (portalAxis == Direction.Axis.X) {
             z = portalRect.minCorner.getZ() + 0.5D;
-        }
-        else if (portalAxis == Direction.Axis.Z) {
+        } else if (portalAxis == Direction.Axis.Z) {
             x = portalRect.minCorner.getX() + 0.5D;
         }
 
@@ -160,11 +189,14 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
             link.executePostTeleportEvent(entity1);
         });
 
-        return new TeleportTransition(serverLevel,
-                new Vec3(x, y, z),
-                entity.getDeltaMovement(),
-                entity.getYRot(), entity.getXRot(),
-                post);
+        return new TeleportTransition(
+            serverLevel,
+            new Vec3(x, y, z),
+            entity.getDeltaMovement(),
+            entity.getYRot(),
+            entity.getXRot(),
+            post
+        );
     }
 
     public void lightPortal(Block frameBlock) {
@@ -173,14 +205,19 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
         }
 
         PortalLink link = CustomPortalsMod.getPortalLinkFromBase(frameBlock);
-        BlockState blockState = CustomPortalHelper.blockWithAxis(link != null
+        BlockState blockState = CustomPortalHelper.blockWithAxis(
+            link != null
                 ? link.portalBlock.defaultBlockState()
                 : CustomPortalsMod.CUSTOM_PORTAL_BLOCK.get().defaultBlockState(),
-                portalAxis);
+            portalAxis
+        );
 
-        BlockPos.betweenClosed(lowerCorner, lowerCorner.relative(Direction.UP, height - 1)
-                        .relative(portalAxis, width - 1))
-                .forEach((blockPos) -> levelAccessor.setBlock(blockPos, blockState, 18));
+        BlockPos.betweenClosed(
+            lowerCorner,
+            lowerCorner.relative(Direction.UP, height - 1)
+                .relative(portalAxis, width - 1)
+        )
+            .forEach((blockPos) -> levelAccessor.setBlock(blockPos, blockState, 18));
     }
 
     public void createPortal(Level level, BlockPos pos, BlockState frameBlock, Direction.Axis axis) {

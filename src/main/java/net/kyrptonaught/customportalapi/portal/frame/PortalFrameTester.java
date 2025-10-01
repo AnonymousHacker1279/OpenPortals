@@ -1,9 +1,5 @@
 package net.kyrptonaught.customportalapi.portal.frame;
 
-import net.kyrptonaught.customportalapi.CustomPortalsMod;
-import net.kyrptonaught.customportalapi.portal.PortalIgnitionSource;
-import net.kyrptonaught.customportalapi.util.CustomPortalHelper;
-import net.kyrptonaught.customportalapi.util.PortalLink;
 import net.minecraft.BlockUtil;
 import net.minecraft.BlockUtil.FoundRectangle;
 import net.minecraft.core.BlockPos;
@@ -26,12 +22,20 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import net.kyrptonaught.customportalapi.CustomPortalsMod;
+import net.kyrptonaught.customportalapi.portal.PortalIgnitionSource;
+import net.kyrptonaught.customportalapi.util.CustomPortalHelper;
+import net.kyrptonaught.customportalapi.util.PortalLink;
+
 public abstract class PortalFrameTester {
 
     @Nullable
     public BlockPos lowerCorner;
+
     protected HashSet<Block> VALID_FRAME = new HashSet<>();
+
     protected int foundPortalBlocks;
+
     protected LevelAccessor levelAccessor;
 
     public static boolean validStateInsidePortal(BlockState blockState, HashSet<Block> foundations) {
@@ -67,7 +71,13 @@ public abstract class PortalFrameTester {
 
     public abstract Optional<PortalFrameTester> getNewPortal(LevelAccessor level, BlockPos blockPos, Axis axis, Block... foundations);
 
-    public abstract Optional<PortalFrameTester> getOrEmpty(LevelAccessor level, BlockPos blockPos, Predicate<PortalFrameTester> predicate, Direction.Axis axis, Block... foundations);
+    public abstract Optional<PortalFrameTester> getOrEmpty(
+        LevelAccessor level,
+        BlockPos blockPos,
+        Predicate<PortalFrameTester> predicate,
+        Direction.Axis axis,
+        Block... foundations
+    );
 
     public abstract boolean isAlreadyLitPortalFrame();
 
@@ -87,7 +97,14 @@ public abstract class PortalFrameTester {
 
     public abstract Vec3 getEntityOffsetInPortal(BlockUtil.FoundRectangle arg, Entity entity, Direction.Axis portalAxis);
 
-    public abstract TeleportTransition getTPTargetInPortal(ServerLevel serverLevel, FoundRectangle portalRect, Axis portalAxis, Vec3 prevOffset, Entity entity, PortalLink link);
+    public abstract TeleportTransition getTPTargetInPortal(
+        ServerLevel serverLevel,
+        FoundRectangle portalRect,
+        Axis portalAxis,
+        Vec3 prevOffset,
+        Entity entity,
+        PortalLink link
+    );
 
     @Nullable
     protected BlockPos getLowerCorner(BlockPos blockPos, Direction.Axis axis1, Direction.Axis axis2) {
@@ -109,9 +126,11 @@ public abstract class PortalFrameTester {
             offset++;
             if (offset > 20)
                 return null;
-            if ((axis.equals(Direction.Axis.Y) && blockPos.getY() - offset < levelAccessor.getMinY())
+            if (
+                (axis.equals(Direction.Axis.Y) && blockPos.getY() - offset < levelAccessor.getMinY())
                     || (!axis.equals(Direction.Axis.Y)
-                    && !levelAccessor.getWorldBorder().isWithinBounds(blockPos.relative(axis, -offset)))) {
+                        && !levelAccessor.getWorldBorder().isWithinBounds(blockPos.relative(axis, -offset)))
+            ) {
 
                 return null;
             }
@@ -150,13 +169,15 @@ public abstract class PortalFrameTester {
         }
 
         checkPos = lowerCorner.mutable();
-	    return !frameContainsBlock(axis2, axis1, size2, size1, checkPos);
+        return !frameContainsBlock(axis2, axis1, size2, size1, checkPos);
     }
 
     private boolean frameContainsBlock(Axis axis1, Axis axis2, int size1, int size2, BlockPos checkPos) {
         for (int i = 0; i < size1; i++) {
-            if (!VALID_FRAME.contains(levelAccessor.getBlockState(checkPos.relative(axis2, -1)).getBlock())
-                    || !VALID_FRAME.contains(levelAccessor.getBlockState(checkPos.relative(axis2, size2)).getBlock())) {
+            if (
+                !VALID_FRAME.contains(levelAccessor.getBlockState(checkPos.relative(axis2, -1)).getBlock())
+                    || !VALID_FRAME.contains(levelAccessor.getBlockState(checkPos.relative(axis2, size2)).getBlock())
+            ) {
 
                 return true;
             }
@@ -174,7 +195,11 @@ public abstract class PortalFrameTester {
 
         for (int i = 0; i < size1; i++) {
             for (int j = 0; j < size2; j++) {
-                if (CustomPortalHelper.isInstanceOfCustomPortal(levelAccessor.getBlockState(lowerCorner.relative(axis1, i).relative(axis2, j)))) {
+                if (
+                    CustomPortalHelper.isInstanceOfCustomPortal(
+                        levelAccessor.getBlockState(lowerCorner.relative(axis1, i).relative(axis2, j))
+                    )
+                ) {
                     foundPortalBlocks++;
                 }
             }

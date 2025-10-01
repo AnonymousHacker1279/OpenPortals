@@ -1,9 +1,5 @@
 package net.kyrptonaught.customportalapi;
 
-import net.kyrptonaught.customportalapi.portal.frame.PortalFrameTester;
-import net.kyrptonaught.customportalapi.util.CustomPortalHelper;
-import net.kyrptonaught.customportalapi.util.CustomTeleporter;
-import net.kyrptonaught.customportalapi.util.PortalLink;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -28,11 +24,19 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
+import net.kyrptonaught.customportalapi.portal.frame.PortalFrameTester;
+import net.kyrptonaught.customportalapi.util.CustomPortalHelper;
+import net.kyrptonaught.customportalapi.util.CustomTeleporter;
+import net.kyrptonaught.customportalapi.util.PortalLink;
+
 public class CustomPortalBlock extends Block implements Portal {
 
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
+
     protected static final VoxelShape X_SHAPE = Block.box(0.0D, 0.0D, 6.0D, 16.0D, 16.0D, 10.0D);
+
     protected static final VoxelShape Z_SHAPE = Block.box(6.0D, 0.0D, 0.0D, 10.0D, 16.0D, 16.0D);
+
     protected static final VoxelShape Y_SHAPE = Block.box(0.0D, 6.0D, 0.0D, 16.0D, 10.0D, 16.0D);
 
     public CustomPortalBlock(Properties properties) {
@@ -55,12 +59,21 @@ public class CustomPortalBlock extends Block implements Portal {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+    protected BlockState updateShape(
+        BlockState state,
+        LevelReader level,
+        ScheduledTickAccess scheduledTickAccess,
+        BlockPos pos,
+        Direction direction,
+        BlockPos neighborPos,
+        BlockState neighborState,
+        RandomSource random
+    ) {
         Block portalBase = getPortalBase((Level) level, pos);
         PortalLink link = CustomPortalsMod.getPortalLinkFromBase(portalBase);
         if (link != null) {
             PortalFrameTester portalFrameTester = link.getFrameTester()
-                    .init((LevelAccessor) level, pos, CustomPortalHelper.getAxisFrom(state), portalBase);
+                .init((LevelAccessor) level, pos, CustomPortalHelper.getAxisFrom(state), portalBase);
             if (portalFrameTester.isAlreadyLitPortalFrame()) {
                 return super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
             }
@@ -87,14 +100,14 @@ public class CustomPortalBlock extends Block implements Portal {
             SoundEvent event = BuiltInRegistries.SOUND_EVENT.getValue(link.ambientSoundLocation);
             if (event != null) {
                 level.playLocalSound(
-                        pos.getX() + 0.5D,
-                        pos.getY() + 0.5D,
-                        pos.getZ() + 0.5D,
-                        event,
-                        SoundSource.BLOCKS,
-                        link.ambientSoundVolume.apply(level),
-                        link.ambientSoundPitch.apply(level),
-                        false
+                    pos.getX() + 0.5D,
+                    pos.getY() + 0.5D,
+                    pos.getZ() + 0.5D,
+                    event,
+                    SoundSource.BLOCKS,
+                    link.ambientSoundVolume.apply(level),
+                    link.ambientSoundPitch.apply(level),
+                    false
                 );
             }
         }
@@ -129,9 +142,15 @@ public class CustomPortalBlock extends Block implements Portal {
     @Override
     public int getPortalTransitionTime(ServerLevel level, Entity entity) {
         if (entity instanceof Player playerEntity) {
-            return Math.max(1, level.getGameRules().getInt(playerEntity.getAbilities().invulnerable
+            return Math.max(
+                1,
+                level.getGameRules()
+                    .getInt(
+                        playerEntity.getAbilities().invulnerable
                             ? GameRules.RULE_PLAYERS_NETHER_PORTAL_CREATIVE_DELAY
-                            : GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY));
+                            : GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY
+                    )
+            );
         }
 
         return 0;

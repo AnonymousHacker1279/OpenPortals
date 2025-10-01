@@ -1,8 +1,6 @@
 package net.kyrptonaught.customportalapi;
 
 import com.mojang.logging.LogUtils;
-import net.kyrptonaught.customportalapi.portal.linking.PortalLinkingStorage;
-import net.kyrptonaught.customportalapi.util.PortalLink;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -22,16 +20,22 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+import net.kyrptonaught.customportalapi.portal.linking.PortalLinkingStorage;
+import net.kyrptonaught.customportalapi.util.PortalLink;
+
 @Mod(CustomPortalsMod.MOD_ID)
 public class CustomPortalsMod {
 
     public static final String MOD_ID = "cpapireforged";
+
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MOD_ID);
-    public static final Supplier<CustomPortalBlock> CUSTOM_PORTAL_BLOCK = BLOCKS.registerBlock("custom_portal_block",
-        (properties) -> new CustomPortalBlock(properties
-                .noCollission()
+
+    public static final Supplier<CustomPortalBlock> CUSTOM_PORTAL_BLOCK = BLOCKS.registerBlock(
+        "custom_portal_block",
+        (properties) -> new CustomPortalBlock(
+            properties.noCollision()
                 .randomTicks()
                 .strength(-1)
                 .sound(
@@ -42,7 +46,9 @@ public class CustomPortalsMod {
     );
 
     public static final HashMap<ResourceLocation, ResourceKey<Level>> dimensions = new HashMap<>();
+
     public static final ConcurrentHashMap<Block, PortalLink> PORTALS = new ConcurrentHashMap<>();
+
     @Nullable
     public static PortalLinkingStorage portalLinkingStorage;
 
@@ -65,7 +71,7 @@ public class CustomPortalsMod {
     }
 
     public static void addPortal(Block frameBlock, PortalLink link) {
-	    if (!dimensions.isEmpty() && !dimensions.containsKey(link.targetDimensionLocation)) {
+        if (!dimensions.isEmpty() && !dimensions.containsKey(link.targetDimensionLocation)) {
             throw new RuntimeException("Dimension not found");
         }
 

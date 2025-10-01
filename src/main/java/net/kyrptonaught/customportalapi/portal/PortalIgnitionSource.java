@@ -19,6 +19,7 @@ public class PortalIgnitionSource {
         SourceType.BLOCK_PLACED,
         BuiltInRegistries.BLOCK.getKey(Blocks.FIRE)
     );
+
     public static final PortalIgnitionSource WATER = fromFluid(Fluids.WATER);
 
     public enum SourceType {
@@ -29,8 +30,11 @@ public class PortalIgnitionSource {
     }
 
     private static final HashSet<Item> USE_ITEMS = new HashSet<>();
+
     public final SourceType sourceType;
+
     public final ResourceLocation ignitionSourceID;
+
     @Nullable
     public Player player;
 
@@ -63,13 +67,13 @@ public class PortalIgnitionSource {
 
     public boolean isWater() {
         return Optional.of(BuiltInRegistries.FLUID.get(ignitionSourceID))
-                .filter(fluid -> fluid.isPresent() && fluid.orElseThrow().is(FluidTags.WATER))
-                .isPresent();
+            .filter(fluid -> fluid.isPresent() && fluid.orElseThrow().is(FluidTags.WATER))
+            .isPresent();
     }
 
     public boolean isLava() {
         return Optional.of(BuiltInRegistries.FLUID.get(ignitionSourceID))
-                .filter(fluid -> fluid.isPresent() && fluid.orElseThrow().is(FluidTags.LAVA))
-                .isPresent();
+            .filter(fluid -> fluid.isPresent() && fluid.orElseThrow().is(FluidTags.LAVA))
+            .isPresent();
     }
 }

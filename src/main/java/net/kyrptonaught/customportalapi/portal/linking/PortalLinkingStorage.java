@@ -15,22 +15,21 @@ import java.util.List;
 
 public class PortalLinkingStorage extends SavedData {
 
-    public static final Codec<PortalLinkingStorage> CODEC = RecordCodecBuilder.create(instance ->
-            instance.group(
-                    DimensionLink.CODEC.listOf().fieldOf("dimensionLinks").forGetter(PortalLinkingStorage::getDimensionLinks)
-            ).apply(instance, PortalLinkingStorage::new)
+    public static final Codec<PortalLinkingStorage> CODEC = RecordCodecBuilder.create(
+        instance -> instance.group(
+            DimensionLink.CODEC.listOf().fieldOf("dimensionLinks").forGetter(PortalLinkingStorage::getDimensionLinks)
+        ).apply(instance, PortalLinkingStorage::new)
     );
 
-    public static final SavedDataType<PortalLinkingStorage> TYPE =  new SavedDataType<>(
-            "customportalapi_dimension_links",
-            PortalLinkingStorage::new,
-            CODEC
+    public static final SavedDataType<PortalLinkingStorage> TYPE = new SavedDataType<>(
+        "customportalapi_dimension_links",
+        PortalLinkingStorage::new,
+        CODEC
     );
 
     private final List<DimensionLink> dimensionLinks = new ArrayList<>();
 
-    public PortalLinkingStorage() {
-    }
+    public PortalLinkingStorage() {}
 
     public PortalLinkingStorage(List<DimensionLink> portalLinks) {
         this.dimensionLinks.addAll(portalLinks);
@@ -66,7 +65,9 @@ public class PortalLinkingStorage extends SavedData {
         }
 
         if (!found) {
-            dimensionLinks.add(new DimensionLink(new DimensionalBlockPos(fromDim, portalFramePos), new DimensionalBlockPos(destDim, destPortalFramePos)));
+            dimensionLinks.add(
+                new DimensionLink(new DimensionalBlockPos(fromDim, portalFramePos), new DimensionalBlockPos(destDim, destPortalFramePos))
+            );
         }
     }
 

@@ -1,9 +1,5 @@
 package net.kyrptonaught.customportalapi.portal;
 
-import net.kyrptonaught.customportalapi.CustomPortalsMod;
-import net.kyrptonaught.customportalapi.portal.frame.PortalFrameTester;
-import net.kyrptonaught.customportalapi.util.CustomPortalHelper;
-import net.kyrptonaught.customportalapi.util.PortalLink;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -11,13 +7,18 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.Optional;
 
+import net.kyrptonaught.customportalapi.CustomPortalsMod;
+import net.kyrptonaught.customportalapi.portal.frame.PortalFrameTester;
+import net.kyrptonaught.customportalapi.util.CustomPortalHelper;
+import net.kyrptonaught.customportalapi.util.PortalLink;
+
 public class PortalIgniter {
 
     /**
      * Attempts to light a portal at the specified position in the given level.
      *
-     * @param level the level where the portal is to be lit
-     * @param portalPos the position of the portal to be lit
+     * @param level          the level where the portal is to be lit
+     * @param portalPos      the position of the portal to be lit
      * @param ignitionSource the source of ignition for the portal
      * @return true if the portal was successfully lit, false otherwise
      */
@@ -28,9 +29,9 @@ public class PortalIgniter {
     /**
      * Attempts to light a portal at the specified position in the given level.
      *
-     * @param level the level where the portal is to be lit
-     * @param portalPos the position of the portal to be lit
-     * @param framePos the position of the frame block for the portal
+     * @param level          the level where the portal is to be lit
+     * @param portalPos      the position of the portal to be lit
+     * @param framePos       the position of the frame block for the portal
      * @param ignitionSource the source of ignition for the portal
      * @return true if the portal was successfully lit, false otherwise
      */
@@ -48,19 +49,28 @@ public class PortalIgniter {
     /**
      * Actually perform the lighting of the portal.
      *
-     * @param link the {@link PortalLink} associated with the portal
-     * @param level the level where the portal is to be lit
-     * @param pos the position of the portal to be lit
+     * @param link            the {@link PortalLink} associated with the portal
+     * @param level           the level where the portal is to be lit
+     * @param pos             the position of the portal to be lit
      * @param foundationBlock the block that serves as the foundation for the portal
-     * @param ignitionSource the source of ignition for the portal
+     * @param ignitionSource  the source of ignition for the portal
      * @return true if the portal was successfully lit, false otherwise
      */
-    private static boolean attemptToLightPortal(PortalLink link, Level level, BlockPos pos, Block foundationBlock, PortalIgnitionSource ignitionSource) {
+    private static boolean attemptToLightPortal(
+        PortalLink link,
+        Level level,
+        BlockPos pos,
+        Block foundationBlock,
+        PortalIgnitionSource ignitionSource
+    ) {
         Optional<PortalFrameTester> optional = link.getFrameTester().getNewPortal(level, pos, Direction.Axis.X, foundationBlock);
 
         // Check for valid frame and correct size (if applicable)
         if (optional.isPresent()) {
-            if (optional.get().isRequestedSize(link.strictWidth, link.strictHeight) && link.getPrePortalIgniteEvent().apply(pos, ignitionSource)) {
+            if (
+                optional.get().isRequestedSize(link.strictWidth, link.strictHeight) && link.getPrePortalIgniteEvent()
+                    .apply(pos, ignitionSource)
+            ) {
                 optional.get().lightPortal(foundationBlock);
                 link.getPostPortalIgniteEvent().accept(pos, ignitionSource);
             }

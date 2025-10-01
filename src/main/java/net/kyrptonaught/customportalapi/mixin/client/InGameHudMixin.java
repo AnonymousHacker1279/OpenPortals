@@ -1,9 +1,6 @@
 package net.kyrptonaught.customportalapi.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.kyrptonaught.customportalapi.CustomPortalBlock;
-import net.kyrptonaught.customportalapi.CustomPortalsMod;
-import net.kyrptonaught.customportalapi.util.PortalLink;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.player.LocalPlayer;
@@ -21,6 +18,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import net.kyrptonaught.customportalapi.CustomPortalBlock;
+import net.kyrptonaught.customportalapi.CustomPortalsMod;
+import net.kyrptonaught.customportalapi.util.PortalLink;
+
 @Mixin(Gui.class)
 public class InGameHudMixin {
 
@@ -31,9 +32,12 @@ public class InGameHudMixin {
     @Unique
     private int customportalapi_reforged$lastColor = -1;
 
-    @ModifyExpressionValue(method = "renderPortalOverlay", at = @At(
+    @ModifyExpressionValue(
+        method = "renderPortalOverlay", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/util/ARGB;white(F)I"))
+            target = "Lnet/minecraft/util/ARGB;white(F)I"
+        )
+    )
     public int changeColor(int original) {
         if (minecraft.player == null) {
             return original;
@@ -76,7 +80,7 @@ public class InGameHudMixin {
         }
 
         if (portalBlock instanceof CustomPortalBlock customportalblock && portalPos != null) {
-            PortalLink link = CustomPortalsMod.getPortalLinkFromBase(customportalblock.getPortalBase(player.clientLevel, portalPos));
+            PortalLink link = CustomPortalsMod.getPortalLinkFromBase(customportalblock.getPortalBase(player.level(), portalPos));
             if (link != null) {
                 customportalapi_reforged$lastColor = link.color;
                 return;
