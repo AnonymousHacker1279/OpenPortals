@@ -6,6 +6,8 @@ plugins {
     id 'idea'
 }
 
+apply from: 'optimization_utils.gradle'
+
 tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
 }
@@ -26,11 +28,28 @@ sourceSets {
     test {
         compileClasspath += main.output
     }
+    generated
+    datagen {
+        compileClasspath += main.output
+    }
+}
+
+configurations {
+    extendConfigurations(implementation, datagenImplementation)
+    extendConfigurations(compileOnly, datagenCompileOnly)
+    extendConfigurations(runtimeOnly, datagenRuntimeOnly)
+}
+
+static void extendConfigurations(Configuration base, Configuration... configurations) {
+    for (configuration in configurations) {
+        configuration.extendsFrom(base)
+    }
 }
 
 neoForge {
     version = project.neo_version
     addModdingDependenciesTo sourceSets.test
+    addModdingDependenciesTo sourceSets.datagen
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
@@ -74,6 +93,7 @@ neoForge {
         "${mod_id}" {
             sourceSet(sourceSets.main)
             sourceSet(sourceSets.test)
+            sourceSet(sourceSets.datagen)
         }
     }
 }
