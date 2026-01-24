@@ -3,10 +3,12 @@
     {
       "faces": {
         "down": {
-          "texture": "#texture"
+          "texture": "#texture",
+          "tintindex": 1
         },
         "up": {
-          "texture": "#texture"
+          "texture": "#texture",
+          "tintindex": 1
         }
       },
       "from": [

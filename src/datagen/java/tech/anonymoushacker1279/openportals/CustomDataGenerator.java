@@ -17,6 +17,7 @@ public class CustomDataGenerator {
 		PackOutput output = generator.getPackOutput();
 
 		generator.addProvider(true, new BlockModelGenerator(output));
+		generator.addProvider(true, new LanguageGenerator(output));
 		generator.addProvider(true, PackMetadataGenerator.forFeaturePack(output, Component.literal("OpenPortals Resources")));
 	}
 }

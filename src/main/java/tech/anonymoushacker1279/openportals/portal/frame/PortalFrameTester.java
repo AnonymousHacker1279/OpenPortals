@@ -16,16 +16,24 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import tech.anonymoushacker1279.openportals.CustomPortalBlock;
+import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.OpenPortals;
 import tech.anonymoushacker1279.openportals.portal.PortalIgnitionSource;
-import tech.anonymoushacker1279.openportals.util.PortalLink;
+import tech.anonymoushacker1279.openportals.portal.PortalLink;
+import tech.anonymoushacker1279.openportals.portal.frame.api.PortalBuilder;
+import tech.anonymoushacker1279.openportals.portal.frame.api.PortalTeleporter;
+import tech.anonymoushacker1279.openportals.portal.frame.api.PortalValidator;
+import tech.anonymoushacker1279.openportals.util.PortalConstants;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.function.Predicate;
 
-public abstract class PortalFrameTester {
+/**
+ * Abstract base class for portal frame testing and manipulation.
+ * <p>
+ * Subclasses should implement the specific portal shape logic (vertical, horizontal, etc.).
+ */
+public abstract class PortalFrameTester implements PortalValidator, PortalBuilder, PortalTeleporter {
 
 	@Nullable
 	public BlockPos lowerCorner;
@@ -38,7 +46,7 @@ public abstract class PortalFrameTester {
 		for (Block block : foundations) {
 			PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(block);
 			if (link != null) {
-				ignitionSource = link.ignitionSource;
+				ignitionSource = link.getIgnitionSource();
 				break;
 			}
 		}
@@ -62,33 +70,55 @@ public abstract class PortalFrameTester {
 		return false;
 	}
 
-	public abstract PortalFrameTester init(LevelAccessor level, BlockPos blockPos, Axis axis, Block... foundations);
+	@Override
+	public abstract PortalValidator init(LevelAccessor level, BlockPos blockPos, Axis axis, Block... foundations);
 
-	public abstract Optional<PortalFrameTester> getNewPortal(LevelAccessor level, BlockPos blockPos, Axis axis, Block... foundations);
+	/**
+	 * Try to find a new, unlit portal frame at the given position.
+	 *
+	 * @return this validator if a valid unlit portal is found, null otherwise
+	 */
+	@Nullable
+	public abstract PortalValidator getNewPortal(LevelAccessor level, BlockPos blockPos, Axis axis, Block... foundations);
 
-	public abstract Optional<PortalFrameTester> getOrEmpty(LevelAccessor level, BlockPos blockPos,
-	                                                       Predicate<PortalFrameTester> predicate, Direction.Axis axis,
-	                                                       Block... foundations);
+	/**
+	 * Try to find a portal frame matching the given predicate.
+	 *
+	 * @return this validator if a matching portal is found, null otherwise
+	 */
+	@Nullable
+	public abstract PortalValidator getOrEmpty(LevelAccessor level, BlockPos blockPos,
+	                                           Predicate<PortalFrameTester> predicate, Direction.Axis axis,
+	                                           Block... foundations);
 
+	@Override
 	public abstract boolean isAlreadyLitPortalFrame();
 
+	@Override
 	public abstract boolean isValidFrame();
 
-	public abstract void lightPortal(Block frameBlock);
-
-	public abstract void createPortal(Level level, BlockPos pos, BlockState frameBlock, Direction.Axis axis);
-
+	@Override
 	public abstract boolean isRequestedSize(int attemptWidth, int attemptHeight);
 
+	@Override
 	@Nullable
 	public abstract BlockUtil.FoundRectangle getRectangle();
 
+	@Override
 	@Nullable
-	public abstract BlockPos doesPortalFitAt(Level level, BlockPos attemptPos, Direction.Axis axis);
+	public abstract BlockPos doesPortalFitAt(LevelAccessor level, BlockPos attemptPos, Direction.Axis axis);
 
+	@Override
+	public abstract void lightPortal(Block frameBlock);
+
+	@Override
+	public abstract void createPortal(Level level, BlockPos pos, BlockState frameBlock, Direction.Axis axis);
+
+	@Override
 	public abstract Vec3 getEntityOffsetInPortal(BlockUtil.FoundRectangle arg, Entity entity);
 
-	public abstract TeleportTransition getTPTargetInPortal(
+	@Override
+	public abstract TeleportTransition getTeleportTargetInPortal(
 			ServerLevel serverLevel,
 			BlockUtil.FoundRectangle portalRect,
 			Axis portalAxis,
@@ -115,7 +145,7 @@ public abstract class PortalFrameTester {
 		int offset = 1;
 		while (validStateInsidePortal(levelAccessor.getBlockState(blockPos.relative(axis, -offset)), VALID_FRAME)) {
 			offset++;
-			if (offset > 20)
+			if (offset > PortalConstants.MAX_FRAME_CHECK_DISTANCE)
 				return null;
 			if (
 					(axis.equals(Direction.Axis.Y) && blockPos.getY() - offset < levelAccessor.getMinY())
@@ -198,5 +228,31 @@ public abstract class PortalFrameTester {
 			return state.setValue(CustomPortalBlock.AXIS, axis);
 		}
 		return state;
+	}
+
+	/**
+	 * Fills air around the portal if the block is solid.
+	 *
+	 * @param level the level to modify
+	 * @param pos   the position to check and potentially fill with air
+	 */
+	protected void fillAirAroundPortal(Level level, BlockPos pos) {
+		BlockState state = level.getBlockState(pos);
+		if (state.isSolid() || state.isRedstoneConductor(level, pos)) {
+			level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+		}
+	}
+
+	/**
+	 * Places a landing pad block if the current block is not solid.
+	 *
+	 * @param level      the level to modify
+	 * @param pos        the position to place the landing pad
+	 * @param frameBlock the frame block to use as landing pad
+	 */
+	protected void placeLandingPad(Level level, BlockPos pos, BlockState frameBlock) {
+		if (!level.getBlockState(pos).isSolid()) {
+			level.setBlockAndUpdate(pos, frameBlock);
+		}
 	}
 }

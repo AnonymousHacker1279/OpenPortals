@@ -12,30 +12,27 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import tech.anonymoushacker1279.openportals.OpenPortals;
-import tech.anonymoushacker1279.openportals.util.PortalLink;
+import tech.anonymoushacker1279.openportals.portal.PortalLink;
+import tech.anonymoushacker1279.openportals.portal.frame.api.PortalValidator;
+import tech.anonymoushacker1279.openportals.util.PortalConstants;
 
-import java.util.Optional;
 import java.util.function.Predicate;
 
-public class VanillaPortalFrameTester extends PortalFrameTester {
+public class VerticalPortalFrameTester extends PortalFrameTester {
 
-	protected final int maxWidth = 21;
-
-	protected final int maxHeight = 21;
-
+	protected final int maxWidth = PortalConstants.MAX_PORTAL_WIDTH;
+	protected final int maxHeight = PortalConstants.MAX_PORTAL_HEIGHT;
 	protected Direction.Axis portalAxis = Direction.Axis.X;
-
 	protected int height;
-
 	protected int width;
 
-	public PortalFrameTester init(LevelAccessor level, BlockPos blockPos, Direction.Axis axis, Block... foundations) {
+	@Override
+	public PortalValidator init(LevelAccessor level, BlockPos blockPos, Direction.Axis axis, Block... foundations) {
 		VALID_FRAME = Sets.newHashSet(foundations);
 		levelAccessor = level;
 		portalAxis = axis;
@@ -45,9 +42,9 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
 			lowerCorner = blockPos;
 			width = height = 1;
 		} else {
-			width = getSize(axis, 2, maxWidth);
+			width = getSize(axis, PortalConstants.MIN_PORTAL_WIDTH, maxWidth);
 			if (width > 0) {
-				height = getSize(Direction.Axis.Y, 3, maxHeight);
+				height = getSize(Direction.Axis.Y, PortalConstants.MIN_PORTAL_HEIGHT, maxHeight);
 				if (checkForValidFrame(axis, Direction.Axis.Y, width, height)) {
 					countExistingPortalBlocks(axis, Direction.Axis.Y, width, height);
 				} else {
@@ -70,7 +67,8 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
 		return new BlockUtil.FoundRectangle(lowerCorner, width, height);
 	}
 
-	public Optional<PortalFrameTester> getNewPortal(LevelAccessor level, BlockPos blockPos, Direction.Axis axis, Block... foundations) {
+	@Nullable
+	public PortalValidator getNewPortal(LevelAccessor level, BlockPos blockPos, Direction.Axis axis, Block... foundations) {
 		return getOrEmpty(
 				level,
 				blockPos,
@@ -80,19 +78,22 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
 		);
 	}
 
-	public Optional<PortalFrameTester> getOrEmpty(LevelAccessor level, BlockPos blockPos, Predicate<PortalFrameTester> predicate,
-	                                              Direction.Axis axis, Block... foundations) {
+	@Nullable
+	public PortalValidator getOrEmpty(LevelAccessor level, BlockPos blockPos, Predicate<PortalFrameTester> predicate,
+	                                  Direction.Axis axis, Block... foundations) {
 
-		Optional<PortalFrameTester> optional = Optional.of(new VanillaPortalFrameTester().init(level, blockPos, axis, foundations))
-				.filter(predicate);
-
-		if (optional.isPresent()) {
-			return optional;
-		} else {
-			Direction.Axis axis2 = axis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
-			return Optional.of(new VanillaPortalFrameTester().init(level, blockPos, axis2, foundations))
-					.filter(predicate);
+		PortalValidator tester = new VerticalPortalFrameTester().init(level, blockPos, axis, foundations);
+		if (predicate.test((PortalFrameTester) tester)) {
+			return tester;
 		}
+
+		Direction.Axis axis2 = axis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
+		PortalValidator tester2 = new VerticalPortalFrameTester().init(level, blockPos, axis2, foundations);
+		if (predicate.test((PortalFrameTester) tester2)) {
+			return tester2;
+		}
+
+		return null;
 	}
 
 	public boolean isAlreadyLitPortalFrame() {
@@ -100,7 +101,9 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
 	}
 
 	public boolean isValidFrame() {
-		return lowerCorner != null && width >= 2 && width <= maxWidth && height >= 3 && height <= maxHeight;
+		return lowerCorner != null
+				&& width >= PortalConstants.MIN_PORTAL_WIDTH && width <= maxWidth
+				&& height >= PortalConstants.MIN_PORTAL_HEIGHT && height <= maxHeight;
 	}
 
 	@Override
@@ -110,15 +113,15 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
 
 	@Override
 	@Nullable
-	public BlockPos doesPortalFitAt(Level level, BlockPos attemptPos, Direction.Axis axis) {
+	public BlockPos doesPortalFitAt(LevelAccessor level, BlockPos attemptPos, Direction.Axis axis) {
 		if (isEmptySpace(level.getBlockState(attemptPos))
 				&& isEmptySpace(level.getBlockState(attemptPos.relative(axis, 1)))
 				&& isEmptySpace(level.getBlockState(attemptPos.above()))
 				&& isEmptySpace(level.getBlockState(attemptPos.relative(axis, 1).above()))
 				&& isEmptySpace(level.getBlockState(attemptPos.above(2)))
 				&& isEmptySpace(level.getBlockState(attemptPos.relative(axis, 1).above(2)))
-				&& canHoldPortal(level, attemptPos.below())
-				&& canHoldPortal(level, attemptPos.relative(axis, 1).below())) {
+				&& canHoldPortal((Level) level, attemptPos.below())
+				&& canHoldPortal((Level) level, attemptPos.relative(axis, 1).below())) {
 
 			return attemptPos;
 		}
@@ -130,9 +133,9 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
 		return blockState.canBeReplaced() && !blockState.liquid();
 	}
 
-	protected boolean canHoldPortal(Level world, BlockPos pos) {
-		BlockState blockState = world.getBlockState(pos);
-		return blockState.isSolid() && blockState.isRedstoneConductor(world, pos) && !isEmptySpace(blockState);
+	protected boolean canHoldPortal(Level level, BlockPos pos) {
+		BlockState blockState = level.getBlockState(pos);
+		return blockState.isSolid() && blockState.isRedstoneConductor(level, pos) && !isEmptySpace(blockState);
 	}
 
 	@Override
@@ -149,8 +152,8 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
 	}
 
 	@Override
-	public TeleportTransition getTPTargetInPortal(ServerLevel serverLevel, BlockUtil.FoundRectangle portalRect, Axis portalAxis,
-	                                              Vec3 prevOffset, Entity entity, PortalLink link) {
+	public TeleportTransition getTeleportTargetInPortal(ServerLevel serverLevel, BlockUtil.FoundRectangle portalRect, Axis portalAxis,
+	                                                    Vec3 prevOffset, Entity entity, PortalLink link) {
 
 		EntityDimensions entityDimensions = entity.getDimensions(entity.getPose());
 		double width = portalRect.axis1Size - entityDimensions.width();
@@ -187,7 +190,7 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
 
 		PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(frameBlock);
 		BlockState blockState = blockWithAxis(link != null
-						? link.portalBlock.defaultBlockState()
+						? link.getPortalBlock().defaultBlockState()
 						: OpenPortals.CUSTOM_PORTAL_BLOCK.get().defaultBlockState(),
 				portalAxis);
 
@@ -238,17 +241,5 @@ public class VanillaPortalFrameTester extends PortalFrameTester {
 		foundPortalBlocks = 6;
 
 		lightPortal(frameBlock.getBlock());
-	}
-
-	protected void fillAirAroundPortal(Level level, BlockPos pos) {
-		if (level.getBlockState(pos).isSolid() || level.getBlockState(pos).isRedstoneConductor(level, pos)) {
-			level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-		}
-	}
-
-	protected void placeLandingPad(Level level, BlockPos pos, BlockState frameBlock) {
-		if (!level.getBlockState(pos).isSolid()) {
-			level.setBlockAndUpdate(pos, frameBlock);
-		}
 	}
 }

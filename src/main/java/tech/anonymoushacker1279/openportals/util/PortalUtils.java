@@ -9,10 +9,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EndPortalBlock;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import tech.anonymoushacker1279.openportals.CustomPortalBlock;
+import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.OpenPortals;
 
 public class PortalUtils {
+
+	private static final int MAX_PORTAL_BASE_SEARCH_DEPTH = PortalConstants.MAX_PORTAL_BASE_SEARCH_DEPTH;
 
 	public static boolean isInstanceOfPortalFrame(Level level, BlockPos pos) {
 		if (level.isInWorldBounds(pos)) {
@@ -22,7 +24,15 @@ public class PortalUtils {
 		return false;
 	}
 
-	public static Block getPortalBaseDefault(Level level, BlockPos pos) {
+	public static Block getPortalBase(Level level, BlockPos pos) {
+		return getPortalBase(level, pos, 0);
+	}
+
+	private static Block getPortalBase(Level level, BlockPos pos, int depth) {
+		if (depth > MAX_PORTAL_BASE_SEARCH_DEPTH) {
+			return Blocks.AIR;
+		}
+
 		if (level.getBlockState(pos).getBlock() instanceof CustomPortalBlock) {
 			Axis axis = getAxisFrom(level.getBlockState(pos));
 
@@ -39,9 +49,10 @@ public class PortalUtils {
 			if (isInstanceOfPortalFrame(level, pos.relative(axis, 1)))
 				return level.getBlockState(pos.relative(axis, 1)).getBlock();
 
-			return getPortalBaseDefault(level, pos.relative(axis, -1));
-		} else if (isInstanceOfPortalFrame(level, pos))
+			return getPortalBase(level, pos.relative(axis, -1), depth + 1);
+		} else if (isInstanceOfPortalFrame(level, pos)) {
 			return level.getBlockState(pos).getBlock();
+		}
 
 		return Blocks.AIR;
 	}

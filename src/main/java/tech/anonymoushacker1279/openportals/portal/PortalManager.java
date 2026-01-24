@@ -1,4 +1,4 @@
-package tech.anonymoushacker1279.openportals;
+package tech.anonymoushacker1279.openportals.portal;
 
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -8,17 +8,19 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.jetbrains.annotations.Nullable;
+import tech.anonymoushacker1279.openportals.OpenPortals;
 import tech.anonymoushacker1279.openportals.event.NeoEventSubscriber;
 import tech.anonymoushacker1279.openportals.portal.linking.PortalLinkingStorage;
-import tech.anonymoushacker1279.openportals.util.PortalLink;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PortalManager {
 
-	private static final HashMap<Identifier, ResourceKey<Level>> dimensions = new HashMap<>();
+	private static final Map<Identifier, ResourceKey<Level>> dimensions = Collections.synchronizedMap(new HashMap<>());
 	private static final ConcurrentHashMap<Block, PortalLink> portals = new ConcurrentHashMap<>();
 	@Nullable
 	private static PortalLinkingStorage portalLinkingStorage;
@@ -30,8 +32,8 @@ public class PortalManager {
 	 * @param link       the portal link
 	 */
 	public void addPortal(Block frameBlock, PortalLink link) {
-		if (!dimensions.isEmpty() && !dimensions.containsKey(link.targetDimensionIdentifier)) {
-			OpenPortals.LOGGER.error("Failed to add portal for dimension {} - dimension not found!", link.targetDimensionIdentifier);
+		if (!dimensions.isEmpty() && !dimensions.containsKey(link.getTargetDimensionIdentifier())) {
+			OpenPortals.LOGGER.error("Failed to add portal for dimension {} - dimension not found!", link.getTargetDimensionIdentifier());
 		}
 
 		if (portals.containsKey(frameBlock) || frameBlock.equals(Blocks.OBSIDIAN)) {

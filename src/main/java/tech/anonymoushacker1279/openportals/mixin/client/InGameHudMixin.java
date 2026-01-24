@@ -17,9 +17,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import tech.anonymoushacker1279.openportals.CustomPortalBlock;
+import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.OpenPortals;
-import tech.anonymoushacker1279.openportals.util.PortalLink;
+import tech.anonymoushacker1279.openportals.portal.PortalLink;
 
 @Mixin(Gui.class)
 public class InGameHudMixin {
@@ -69,9 +69,9 @@ public class InGameHudMixin {
 		}
 
 		if (portalBlock instanceof CustomPortalBlock customportalblock && portalPos != null) {
-			PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(customportalblock.getPortalBase(player.level(), portalPos));
+			PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(customportalblock.getCachedPortalBase(player.level(), portalPos));
 			if (link != null) {
-				openportals$lastColor = link.color;
+				openportals$lastColor = link.getColor();
 				return;
 			}
 		}

@@ -10,12 +10,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.ApiStatus;
-import tech.anonymoushacker1279.openportals.CustomPortalBlock;
+import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.OpenPortals;
 import tech.anonymoushacker1279.openportals.portal.PortalIgnitionSource;
+import tech.anonymoushacker1279.openportals.portal.PortalLink;
 import tech.anonymoushacker1279.openportals.portal.frame.FlatPortalFrameTester;
 import tech.anonymoushacker1279.openportals.portal.frame.PortalFrameTester;
-import tech.anonymoushacker1279.openportals.util.PortalLink;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -25,10 +25,14 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 public class CustomPortalBuilder {
 
-	private final PortalLink portalLink;
+	private final PortalLink.Builder builder;
 
+	/**
+	 * Create a new CustomPortalBuilder instance.
+	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder() {
-		portalLink = new PortalLink();
+		builder = new PortalLink.Builder();
 	}
 
 	/**
@@ -37,6 +41,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public void build() {
+		PortalLink portalLink = builder.build();
 		OpenPortals.getPortalManager().addPortal(portalLink.getFrameBlock(), portalLink);
 	}
 
@@ -47,7 +52,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder frame(Identifier identifier) {
-		portalLink.setFrameBlock(BuiltInRegistries.BLOCK.getValue(identifier));
+		builder.frameBlock(BuiltInRegistries.BLOCK.getValue(identifier));
 		return this;
 	}
 
@@ -58,7 +63,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder frame(Block block) {
-		portalLink.setFrameBlock(block);
+		builder.frameBlock(block);
 		return this;
 	}
 
@@ -69,7 +74,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder destination(Identifier identifier) {
-		portalLink.targetDimensionIdentifier = identifier;
+		builder.targetDimension(identifier);
 		return this;
 	}
 
@@ -80,7 +85,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder tintColor(int color) {
-		portalLink.color = color;
+		builder.color(color);
 		return this;
 	}
 
@@ -89,7 +94,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder tintColor(int r, int g, int b) {
-		portalLink.color = ((r & 0x0ff) << 16) | ((g & 0x0ff) << 8) | (b & 0x0ff);
+		builder.color(((r & 0x0ff) << 16) | ((g & 0x0ff) << 8) | (b & 0x0ff));
 		return this;
 	}
 
@@ -100,7 +105,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder lightWithItem(Item item) {
-		portalLink.ignitionSource = PortalIgnitionSource.fromItem(item);
+		builder.ignitionSource(PortalIgnitionSource.fromItem(item));
 		return this;
 	}
 
@@ -111,7 +116,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder lightWithFluid(Fluid fluid) {
-		portalLink.ignitionSource = PortalIgnitionSource.fromFluid(fluid);
+		builder.ignitionSource(PortalIgnitionSource.fromFluid(fluid));
 		return this;
 	}
 
@@ -120,7 +125,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder customIgnitionSource(Identifier customSourceLocation) {
-		portalLink.ignitionSource = PortalIgnitionSource.fromCustomSource(customSourceLocation);
+		builder.ignitionSource(PortalIgnitionSource.fromCustomSource(customSourceLocation));
 		return this;
 	}
 
@@ -129,7 +134,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder customIgnitionSource(PortalIgnitionSource ignitionSource) {
-		portalLink.ignitionSource = ignitionSource;
+		builder.ignitionSource(ignitionSource);
 		return this;
 	}
 
@@ -141,8 +146,8 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder withStrictDimensions(int width, int height) {
-		portalLink.strictWidth = width;
-		portalLink.strictHeight = height;
+		builder.strictWidth(width);
+		builder.strictHeight(height);
 		return this;
 	}
 
@@ -151,30 +156,18 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder customPortalBlock(CustomPortalBlock portalBlock) {
-		portalLink.portalBlock = portalBlock;
+		builder.portalBlock(portalBlock);
 		return this;
 	}
 
 	/**
 	 * Specify the dimension this portal will return you to.
 	 *
-	 * @param returnDimensionLocation        Identifier of the dimension the portal will return you to
-	 * @param onlyIgnitableInReturnDimension Whether the portal can only be ignited in the return dimension
+	 * @param returnDimensionLocation Identifier of the dimension the portal will return you to
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
-	public CustomPortalBuilder returnDimension(Identifier returnDimensionLocation, boolean onlyIgnitableInReturnDimension) {
-		portalLink.returnDimensionIdentifier = returnDimensionLocation;
-		portalLink.onlyIgnitableInReturnDimension = onlyIgnitableInReturnDimension;
-		return this;
-	}
-
-	/**
-	 * Specify that this portal can only be ignited in the overworld. Attempting to light it in other dimensions will
-	 * fail.
-	 */
-	@ApiStatus.AvailableSince("1.0.0")
-	public CustomPortalBuilder onlyLightInOverworld() {
-		portalLink.onlyIgnitableInReturnDimension = true;
+	public CustomPortalBuilder returnDimension(Identifier returnDimensionLocation) {
+		builder.returnDimension(returnDimensionLocation);
 		return this;
 	}
 
@@ -183,7 +176,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder flatPortal() {
-		portalLink.portalFrameTester = new FlatPortalFrameTester();
+		builder.frameTester(new FlatPortalFrameTester());
 		return this;
 	}
 
@@ -194,7 +187,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder customFrameTester(PortalFrameTester frameTester) {
-		portalLink.portalFrameTester = frameTester;
+		builder.frameTester(frameTester);
 		return this;
 	}
 
@@ -206,7 +199,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder preTeleportEvent(Function<Entity, Boolean> event) {
-		portalLink.setPreTeleportEvent(event);
+		builder.preTeleportEvent(event);
 		return this;
 	}
 
@@ -217,7 +210,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder postTeleportEvent(Consumer<Entity> event) {
-		portalLink.setPostTeleportEvent(event);
+		builder.postTeleportEvent(event);
 		return this;
 	}
 
@@ -229,7 +222,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder prePortalIgniteEvent(BiFunction<BlockPos, PortalIgnitionSource, Boolean> event) {
-		portalLink.setPrePortalIgniteEvent(event);
+		builder.prePortalIgniteEvent(event);
 		return this;
 	}
 
@@ -240,7 +233,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder postPortalIgniteEvent(BiConsumer<BlockPos, PortalIgnitionSource> event) {
-		portalLink.setPostPortalIgniteEvent(event);
+		builder.postPortalIgniteEvent(event);
 		return this;
 	}
 
@@ -254,7 +247,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder travelSound(Identifier travelSoundLocation, Function<Entity, Float> travelSoundVolume, Function<Entity, Float> travelSoundPitch) {
-		portalLink.setTravelSound(travelSoundLocation, travelSoundVolume, travelSoundPitch);
+		builder.travelSound(travelSoundLocation, travelSoundVolume, travelSoundPitch);
 		return this;
 	}
 
@@ -268,7 +261,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder triggerSound(Identifier triggerSoundLocation, Function<Entity, Float> triggerSoundVolume, Function<Entity, Float> triggerSoundPitch) {
-		portalLink.setTriggerSound(triggerSoundLocation, triggerSoundVolume, triggerSoundPitch);
+		builder.triggerSound(triggerSoundLocation, triggerSoundVolume, triggerSoundPitch);
 		return this;
 	}
 
@@ -281,7 +274,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder ambientSound(Identifier ambientSoundLocation, Function<Level, Float> ambientSoundVolume, Function<Level, Float> ambientSoundPitch) {
-		portalLink.setAmbientSound(ambientSoundLocation, ambientSoundVolume, ambientSoundPitch);
+		builder.ambientSound(ambientSoundLocation, ambientSoundVolume, ambientSoundPitch);
 		return this;
 	}
 
@@ -292,7 +285,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder portalParticle(BiFunction<Level, BlockPos, ParticleOptions> particleFunction) {
-		portalLink.portalParticle = particleFunction;
+		builder.portalParticle(particleFunction);
 		return this;
 	}
 }
