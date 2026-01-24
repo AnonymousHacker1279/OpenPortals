@@ -15,13 +15,6 @@ import java.util.Optional;
 
 public class PortalIgnitionSource {
 
-	public static final PortalIgnitionSource FIRE = new PortalIgnitionSource(
-			SourceType.BLOCK_PLACED,
-			BuiltInRegistries.BLOCK.getKey(Blocks.FIRE)
-	);
-
-	public static final PortalIgnitionSource WATER = fromFluid(Fluids.WATER);
-
 	public enum SourceType {
 		USE_ITEM,
 		BLOCK_PLACED,
@@ -29,10 +22,14 @@ public class PortalIgnitionSource {
 		CUSTOM
 	}
 
+	public static final PortalIgnitionSource FIRE = new PortalIgnitionSource(
+			SourceType.BLOCK_PLACED,
+			BuiltInRegistries.BLOCK.getKey(Blocks.FIRE)
+	);
+	public static final PortalIgnitionSource WATER = fromFluid(Fluids.WATER);
+
 	private static final HashSet<Item> USE_ITEMS = new HashSet<>();
-
 	public final SourceType sourceType;
-
 	public final Identifier ignitionSourceID;
 
 	@Nullable

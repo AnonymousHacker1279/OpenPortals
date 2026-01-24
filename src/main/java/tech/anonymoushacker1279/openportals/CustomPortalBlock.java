@@ -90,7 +90,7 @@ public class CustomPortalBlock extends Block implements Portal {
 		}
 
 		if (random.nextInt(100) == 0) {
-			SoundEvent event = BuiltInRegistries.SOUND_EVENT.getValue(link.ambientSoundLocation);
+			SoundEvent event = BuiltInRegistries.SOUND_EVENT.getValue(link.ambientSoundIdentifier);
 			if (event != null) {
 				level.playLocalSound(
 						pos.getX() + 0.5D,
@@ -135,12 +135,9 @@ public class CustomPortalBlock extends Block implements Portal {
 	@Override
 	public int getPortalTransitionTime(ServerLevel level, Entity entity) {
 		if (entity instanceof Player playerEntity) {
-			return Math.max(
-					1,
-					playerEntity.isCreative()
+			return Math.max(1, playerEntity.isCreative()
 							? level.getGameRules().get(GameRules.PLAYERS_NETHER_PORTAL_CREATIVE_DELAY)
-							: level.getGameRules().get(GameRules.PLAYERS_NETHER_PORTAL_DEFAULT_DELAY)
-			);
+							: level.getGameRules().get(GameRules.PLAYERS_NETHER_PORTAL_DEFAULT_DELAY));
 		}
 
 		return 0;

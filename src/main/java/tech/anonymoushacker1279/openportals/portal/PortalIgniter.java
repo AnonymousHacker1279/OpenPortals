@@ -60,7 +60,7 @@ public class PortalIgniter {
 		Block foundationBlock = level.getBlockState(framePos).getBlock();
 		PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(foundationBlock);
 
-		if (link == null || !link.doesIgnitionMatch(ignitionSource) || !link.canLightInDim(level.dimension().identifier())) {
+		if (link == null || !link.doesIgnitionMatch(ignitionSource) || !link.canLightInDimension(level.dimension().identifier())) {
 			return false;
 		}
 

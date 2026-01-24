@@ -45,9 +45,9 @@ public class CustomTeleporter {
 			return null; // The entity was denied teleportation
 		}
 
-		ResourceKey<Level> destinationKey = level.dimension() == OpenPortals.getPortalManager().getDimensionKey(link.targetDimensionLocation)
-				? OpenPortals.getPortalManager().getDimensionKey(link.returnDimensionLocation)
-				: OpenPortals.getPortalManager().getDimensionKey(link.targetDimensionLocation);
+		ResourceKey<Level> destinationKey = level.dimension() == OpenPortals.getPortalManager().getDimensionKey(link.targetDimensionIdentifier)
+				? OpenPortals.getPortalManager().getDimensionKey(link.returnDimensionIdentifier)
+				: OpenPortals.getPortalManager().getDimensionKey(link.targetDimensionIdentifier);
 
 		ServerLevel destination = ((ServerLevel) level).getServer().getLevel(destinationKey);
 		if (destination == null) {
@@ -207,7 +207,7 @@ public class CustomTeleporter {
 		int topY = Math.min(serverLevel.getMaxY(), serverLevel.getMinY() + serverLevel.getLogicalHeight()) - 5;
 		int bottomY = serverLevel.getMinY() + 5;
 
-		if (serverLevel.dimension().identifier().equals(link.targetDimensionLocation)) {
+		if (serverLevel.dimension().identifier().equals(link.targetDimensionIdentifier)) {
 			if (link.portalSearchYTop != Integer.MIN_VALUE) {
 				topY = link.portalSearchYTop;
 			}

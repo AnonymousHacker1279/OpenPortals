@@ -31,8 +31,8 @@ public class PortalLink {
 	private Block frameBlock;
 	public PortalIgnitionSource ignitionSource = PortalIgnitionSource.FIRE;
 	public CustomPortalBlock portalBlock = OpenPortals.CUSTOM_PORTAL_BLOCK.get();
-	public Identifier targetDimensionLocation = Identifier.withDefaultNamespace("nether");
-	public Identifier returnDimensionLocation = Identifier.withDefaultNamespace("overworld");
+	public Identifier targetDimensionIdentifier = Identifier.withDefaultNamespace("nether");
+	public Identifier returnDimensionIdentifier = Identifier.withDefaultNamespace("overworld");
 	public boolean onlyIgnitableInReturnDimension = false;
 	public int color;
 	public int strictWidth, strictHeight;
@@ -49,17 +49,17 @@ public class PortalLink {
 	};
 
 	@Nullable
-	private Identifier travelSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_TRAVEL);
+	private Identifier travelSoundIdentifier = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_TRAVEL);
 	private Function<Entity, Float> travelSoundVolume = (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F;
 	private Function<Entity, Float> travelSoundPitch = (entity) -> 0.25f;
 
 	@Nullable
-	public Identifier triggerSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_TRIGGER);
+	public Identifier triggerSoundIdentifier = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_TRIGGER);
 	public Function<Entity, Float> triggerSoundVolume = (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F;
 	public Function<Entity, Float> triggerSoundPitch = (entity) -> 0.25f;
 
 	@Nullable
-	public Identifier ambientSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_AMBIENT);
+	public Identifier ambientSoundIdentifier = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_AMBIENT);
 	public Function<Level, Float> ambientSoundVolume = (level) -> 0.5f;
 	public Function<Level, Float> ambientSoundPitch = (level) -> level.random.nextFloat() * 0.4F + 0.8F;
 
@@ -81,17 +81,15 @@ public class PortalLink {
 	}
 
 	public boolean doesIgnitionMatch(PortalIgnitionSource attemptedSource) {
-		return ignitionSource.sourceType == attemptedSource.sourceType && ignitionSource.ignitionSourceID.equals(
-				attemptedSource.ignitionSourceID
-		);
+		return ignitionSource.sourceType == attemptedSource.sourceType && ignitionSource.ignitionSourceID.equals(attemptedSource.ignitionSourceID);
 	}
 
-	public boolean canLightInDim(Identifier dim) {
+	public boolean canLightInDimension(Identifier identifier) {
 		if (!onlyIgnitableInReturnDimension) {
 			return true;
 		}
 
-		return dim.equals(returnDimensionLocation) || dim.equals(targetDimensionLocation);
+		return identifier.equals(returnDimensionIdentifier) || identifier.equals(targetDimensionIdentifier);
 	}
 
 	public Function<Entity, Boolean> getPreTeleportEvent() {
@@ -126,41 +124,28 @@ public class PortalLink {
 		postPortalIgniteEvent = event;
 	}
 
-	public void setTravelSound(
-			Identifier travelSoundLocation,
-			Function<Entity, Float> travelSoundVolume,
-			Function<Entity, Float> travelSoundPitch
-	) {
-		this.travelSoundLocation = travelSoundLocation;
+	public void setTravelSound(Identifier travelSoundIdentifier, Function<Entity, Float> travelSoundVolume, Function<Entity, Float> travelSoundPitch) {
+		this.travelSoundIdentifier = travelSoundIdentifier;
 		this.travelSoundVolume = travelSoundVolume;
 		this.travelSoundPitch = travelSoundPitch;
 	}
 
 	public void playTravelSound(Entity entity) {
-		if (entity instanceof ServerPlayer player && travelSoundLocation != null) {
-			PacketDistributor.sendToPlayer(
-					player,
-					new PlayerSoundPayload(travelSoundLocation, travelSoundVolume.apply(entity), travelSoundPitch.apply(entity))
-			);
+		if (entity instanceof ServerPlayer player && travelSoundIdentifier != null) {
+			PacketDistributor.sendToPlayer(player, new PlayerSoundPayload(travelSoundIdentifier,
+					travelSoundVolume.apply(entity),
+					travelSoundPitch.apply(entity)));
 		}
 	}
 
-	public void setTriggerSound(
-			Identifier triggerSoundLocation,
-			Function<Entity, Float> triggerSoundVolume,
-			Function<Entity, Float> triggerSoundPitch
-	) {
-		this.triggerSoundLocation = triggerSoundLocation;
+	public void setTriggerSound(Identifier triggerSoundIdentifier, Function<Entity, Float> triggerSoundVolume, Function<Entity, Float> triggerSoundPitch) {
+		this.triggerSoundIdentifier = triggerSoundIdentifier;
 		this.triggerSoundVolume = triggerSoundVolume;
 		this.triggerSoundPitch = triggerSoundPitch;
 	}
 
-	public void setAmbientSound(
-			Identifier ambientSoundLocation,
-			Function<Level, Float> ambientSoundVolume,
-			Function<Level, Float> ambientSoundPitch
-	) {
-		this.ambientSoundLocation = ambientSoundLocation;
+	public void setAmbientSound(Identifier ambientSoundIdentifier, Function<Level, Float> ambientSoundVolume, Function<Level, Float> ambientSoundPitch) {
+		this.ambientSoundIdentifier = ambientSoundIdentifier;
 		this.ambientSoundVolume = ambientSoundVolume;
 		this.ambientSoundPitch = ambientSoundPitch;
 	}

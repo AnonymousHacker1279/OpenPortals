@@ -46,9 +46,9 @@ public class LocalPlayerMixin {
 
 		if (portalBlock instanceof CustomPortalBlock customportalblock && portalPos != null) {
 			PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(customportalblock.getPortalBase(player.level(), portalPos));
-			if (link != null && link.triggerSoundLocation != null) {
+			if (link != null && link.triggerSoundIdentifier != null) {
 				return SimpleSoundInstance.forLocalAmbience(
-						BuiltInRegistries.SOUND_EVENT.get(link.triggerSoundLocation).orElseThrow().value(),
+						BuiltInRegistries.SOUND_EVENT.get(link.triggerSoundIdentifier).orElseThrow().value(),
 						link.triggerSoundVolume.apply(player),
 						link.triggerSoundPitch.apply(player)
 				);

@@ -9,6 +9,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.ApiStatus;
 import tech.anonymoushacker1279.openportals.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.OpenPortals;
 import tech.anonymoushacker1279.openportals.portal.PortalIgnitionSource;
@@ -34,6 +35,7 @@ public class CustomPortalBuilder {
 	 * Register the portal when completed. This should be called last, only when you are finished configuring the
 	 * portal.
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public void build() {
 		OpenPortals.getPortalManager().addPortal(portalLink.getFrameBlock(), portalLink);
 	}
@@ -41,10 +43,11 @@ public class CustomPortalBuilder {
 	/**
 	 * Specify a frame block as a {@link Identifier}.
 	 *
-	 * @param blockLocation Identifier of the Block to be used as the portal's frame block
+	 * @param identifier Identifier of the Block to be used as the portal's frame block
 	 */
-	public CustomPortalBuilder frame(Identifier blockLocation) {
-		portalLink.setFrameBlock(BuiltInRegistries.BLOCK.getValue(blockLocation));
+	@ApiStatus.AvailableSince("1.0.0")
+	public CustomPortalBuilder frame(Identifier identifier) {
+		portalLink.setFrameBlock(BuiltInRegistries.BLOCK.getValue(identifier));
 		return this;
 	}
 
@@ -53,6 +56,7 @@ public class CustomPortalBuilder {
 	 *
 	 * @param block Block to be used as the portal's frame block
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder frame(Block block) {
 		portalLink.setFrameBlock(block);
 		return this;
@@ -61,10 +65,11 @@ public class CustomPortalBuilder {
 	/**
 	 * Specify the destination dimension of the portal.
 	 *
-	 * @param dimensionLocation Identifier of the dimension the portal will teleport to
+	 * @param identifier Identifier of the dimension the portal will teleport to
 	 */
-	public CustomPortalBuilder destination(Identifier dimensionLocation) {
-		portalLink.targetDimensionLocation = dimensionLocation;
+	@ApiStatus.AvailableSince("1.0.0")
+	public CustomPortalBuilder destination(Identifier identifier) {
+		portalLink.targetDimensionIdentifier = identifier;
 		return this;
 	}
 
@@ -73,6 +78,7 @@ public class CustomPortalBuilder {
 	 *
 	 * @param color Color to be used to tint the portal block
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder tintColor(int color) {
 		portalLink.color = color;
 		return this;
@@ -81,6 +87,7 @@ public class CustomPortalBuilder {
 	/**
 	 * Specify the color in RGB to be used to tint the portal block.
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder tintColor(int r, int g, int b) {
 		portalLink.color = ((r & 0x0ff) << 16) | ((g & 0x0ff) << 8) | (b & 0x0ff);
 		return this;
@@ -91,6 +98,7 @@ public class CustomPortalBuilder {
 	 *
 	 * @param item Item to be used to ignite the portal
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder lightWithItem(Item item) {
 		portalLink.ignitionSource = PortalIgnitionSource.fromItem(item);
 		return this;
@@ -101,6 +109,7 @@ public class CustomPortalBuilder {
 	 *
 	 * @param fluid Fluid to be used to ignite the portal
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder lightWithFluid(Fluid fluid) {
 		portalLink.ignitionSource = PortalIgnitionSource.fromFluid(fluid);
 		return this;
@@ -109,6 +118,7 @@ public class CustomPortalBuilder {
 	/**
 	 * Specify a custom ignition source to ignite the portal. You must manually trigger the ignition yourself.
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder customIgnitionSource(Identifier customSourceLocation) {
 		portalLink.ignitionSource = PortalIgnitionSource.fromCustomSource(customSourceLocation);
 		return this;
@@ -117,6 +127,7 @@ public class CustomPortalBuilder {
 	/**
 	 * Specify a custom ignition source to ignite the portal. You must manually trigger the ignition yourself.
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder customIgnitionSource(PortalIgnitionSource ignitionSource) {
 		portalLink.ignitionSource = ignitionSource;
 		return this;
@@ -128,6 +139,7 @@ public class CustomPortalBuilder {
 	 * @param width  Width of portal
 	 * @param height Height of portal
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder withStrictDimensions(int width, int height) {
 		portalLink.strictWidth = width;
 		portalLink.strictHeight = height;
@@ -137,6 +149,7 @@ public class CustomPortalBuilder {
 	/**
 	 * Specify a custom block to be used as the portal block.
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder customPortalBlock(CustomPortalBlock portalBlock) {
 		portalLink.portalBlock = portalBlock;
 		return this;
@@ -148,8 +161,9 @@ public class CustomPortalBuilder {
 	 * @param returnDimensionLocation        Identifier of the dimension the portal will return you to
 	 * @param onlyIgnitableInReturnDimension Whether the portal can only be ignited in the return dimension
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder returnDimension(Identifier returnDimensionLocation, boolean onlyIgnitableInReturnDimension) {
-		portalLink.returnDimensionLocation = returnDimensionLocation;
+		portalLink.returnDimensionIdentifier = returnDimensionLocation;
 		portalLink.onlyIgnitableInReturnDimension = onlyIgnitableInReturnDimension;
 		return this;
 	}
@@ -158,6 +172,7 @@ public class CustomPortalBuilder {
 	 * Specify that this portal can only be ignited in the overworld. Attempting to light it in other dimensions will
 	 * fail.
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder onlyLightInOverworld() {
 		portalLink.onlyIgnitableInReturnDimension = true;
 		return this;
@@ -166,6 +181,7 @@ public class CustomPortalBuilder {
 	/**
 	 * Specify that this is a flat portal (end portal style).
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder flatPortal() {
 		portalLink.portalFrameTester = new FlatPortalFrameTester();
 		return this;
@@ -176,6 +192,7 @@ public class CustomPortalBuilder {
 	 *
 	 * @param frameTester The custom portal frame tester to be used
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder customFrameTester(PortalFrameTester frameTester) {
 		portalLink.portalFrameTester = frameTester;
 		return this;
@@ -187,6 +204,7 @@ public class CustomPortalBuilder {
 	 *
 	 * @param event A function that accepts an entity and returns a boolean
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder preTeleportEvent(Function<Entity, Boolean> event) {
 		portalLink.setPreTeleportEvent(event);
 		return this;
@@ -197,6 +215,7 @@ public class CustomPortalBuilder {
 	 *
 	 * @param event A consumer that accepts an entity
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder postTeleportEvent(Consumer<Entity> event) {
 		portalLink.setPostTeleportEvent(event);
 		return this;
@@ -208,6 +227,7 @@ public class CustomPortalBuilder {
 	 *
 	 * @param event A function that accepts a BlockPos and PortalIgnitionSource, returning a boolean
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder prePortalIgniteEvent(BiFunction<BlockPos, PortalIgnitionSource, Boolean> event) {
 		portalLink.setPrePortalIgniteEvent(event);
 		return this;
@@ -218,6 +238,7 @@ public class CustomPortalBuilder {
 	 *
 	 * @param event A consumer that accepts a BlockPos and PortalIgnitionSource
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder postPortalIgniteEvent(BiConsumer<BlockPos, PortalIgnitionSource> event) {
 		portalLink.setPostPortalIgniteEvent(event);
 		return this;
@@ -231,6 +252,7 @@ public class CustomPortalBuilder {
 	 * @param travelSoundVolume   Volume of the sound
 	 * @param travelSoundPitch    Pitch of the sound
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder travelSound(Identifier travelSoundLocation, Function<Entity, Float> travelSoundVolume, Function<Entity, Float> travelSoundPitch) {
 		portalLink.setTravelSound(travelSoundLocation, travelSoundVolume, travelSoundPitch);
 		return this;
@@ -244,6 +266,7 @@ public class CustomPortalBuilder {
 	 * @param triggerSoundVolume   Volume of the sound
 	 * @param triggerSoundPitch    Pitch of the sound
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder triggerSound(Identifier triggerSoundLocation, Function<Entity, Float> triggerSoundVolume, Function<Entity, Float> triggerSoundPitch) {
 		portalLink.setTriggerSound(triggerSoundLocation, triggerSoundVolume, triggerSoundPitch);
 		return this;
@@ -256,6 +279,7 @@ public class CustomPortalBuilder {
 	 * @param ambientSoundVolume   Volume of the sound
 	 * @param ambientSoundPitch    Pitch of the sound
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder ambientSound(Identifier ambientSoundLocation, Function<Level, Float> ambientSoundVolume, Function<Level, Float> ambientSoundPitch) {
 		portalLink.setAmbientSound(ambientSoundLocation, ambientSoundVolume, ambientSoundPitch);
 		return this;
@@ -266,6 +290,7 @@ public class CustomPortalBuilder {
 	 *
 	 * @param particleFunction A function that accepts a Level and BlockPos and returns a ParticleOptions
 	 */
+	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder portalParticle(BiFunction<Level, BlockPos, ParticleOptions> particleFunction) {
 		portalLink.portalParticle = particleFunction;
 		return this;

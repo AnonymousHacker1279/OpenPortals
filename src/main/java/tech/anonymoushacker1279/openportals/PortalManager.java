@@ -30,8 +30,8 @@ public class PortalManager {
 	 * @param link       the portal link
 	 */
 	public void addPortal(Block frameBlock, PortalLink link) {
-		if (!dimensions.isEmpty() && !dimensions.containsKey(link.targetDimensionLocation)) {
-			OpenPortals.LOGGER.error("Failed to add portal for dimension {} - dimension not found!", link.targetDimensionLocation);
+		if (!dimensions.isEmpty() && !dimensions.containsKey(link.targetDimensionIdentifier)) {
+			OpenPortals.LOGGER.error("Failed to add portal for dimension {} - dimension not found!", link.targetDimensionIdentifier);
 		}
 
 		if (portals.containsKey(frameBlock) || frameBlock.equals(Blocks.OBSIDIAN)) {
