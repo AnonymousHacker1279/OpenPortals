@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -151,12 +152,7 @@ public class CustomPortalBlock extends Block implements Portal {
         if (entity instanceof Player playerEntity) {
             return Math.max(
                 1,
-                level.getGameRules()
-                    .getInt(
-                        playerEntity.getAbilities().invulnerable
-                            ? GameRules.RULE_PLAYERS_NETHER_PORTAL_CREATIVE_DELAY
-                            : GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY
-                    )
+                playerEntity.isCreative() ? level.getGameRules().get(GameRules.PLAYERS_NETHER_PORTAL_CREATIVE_DELAY) : level.getGameRules().get(GameRules.PLAYERS_NETHER_PORTAL_DEFAULT_DELAY)
             );
         }
 

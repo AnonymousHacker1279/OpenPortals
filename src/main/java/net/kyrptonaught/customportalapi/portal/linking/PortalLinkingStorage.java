@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
@@ -43,7 +43,7 @@ public class PortalLinkingStorage extends SavedData {
     @Nullable
     public DimensionalBlockPos getDestination(BlockPos portalFramePos, ResourceKey<Level> dim) {
         for (DimensionLink link : dimensionLinks) {
-            if (link.fromPos().dimension().equals(dim.location()) && link.fromPos().pos().equals(portalFramePos)) {
+            if (link.fromPos().dimension().equals(dim.identifier()) && link.fromPos().pos().equals(portalFramePos)) {
                 return link.toPos();
             }
         }
@@ -56,7 +56,7 @@ public class PortalLinkingStorage extends SavedData {
         addLink(destPortalFramePos, destDim, portalFramePos, fromDim);
     }
 
-    private void addLink(BlockPos portalFramePos, ResourceLocation fromDim, BlockPos destPortalFramePos, ResourceLocation destDim) {
+    private void addLink(BlockPos portalFramePos, Identifier fromDim, BlockPos destPortalFramePos, Identifier destDim) {
         boolean found = false;
         for (DimensionLink link : dimensionLinks) {
             if (link.fromPos().dimension().equals(fromDim) && link.fromPos().pos().equals(portalFramePos)) {
@@ -73,7 +73,7 @@ public class PortalLinkingStorage extends SavedData {
     }
 
     private void addLink(BlockPos portalFramePos, ResourceKey<Level> fromDim, BlockPos destPortalFramePos, ResourceKey<Level> destDim) {
-        addLink(portalFramePos, fromDim.location(), destPortalFramePos, destDim.location());
+        addLink(portalFramePos, fromDim.identifier(), destPortalFramePos, destDim.identifier());
     }
 
     @Override

@@ -5,7 +5,7 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
@@ -35,9 +35,9 @@ public class PortalLink {
 
     public CustomPortalBlock portalBlock = CustomPortalsMod.CUSTOM_PORTAL_BLOCK.get();
 
-    public ResourceLocation targetDimensionLocation = ResourceLocation.withDefaultNamespace("nether");
+    public Identifier targetDimensionLocation = Identifier.withDefaultNamespace("nether");
 
-    public ResourceLocation returnDimensionLocation = ResourceLocation.withDefaultNamespace("overworld");
+    public Identifier returnDimensionLocation = Identifier.withDefaultNamespace("overworld");
 
     public boolean onlyIgnitableInReturnDimension = false;
 
@@ -60,21 +60,21 @@ public class PortalLink {
     private BiConsumer<BlockPos, PortalIgnitionSource> postPortalIgniteEvent = (portalPos, source) -> {};
 
     @Nullable
-    private ResourceLocation travelSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_TRAVEL);
+    private Identifier travelSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_TRAVEL);
 
     private Function<Entity, Float> travelSoundVolume = (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F;
 
     private Function<Entity, Float> travelSoundPitch = (entity) -> 0.25f;
 
     @Nullable
-    public ResourceLocation triggerSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_TRIGGER);
+    public Identifier triggerSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_TRIGGER);
 
     public Function<Entity, Float> triggerSoundVolume = (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F;
 
     public Function<Entity, Float> triggerSoundPitch = (entity) -> 0.25f;
 
     @Nullable
-    public ResourceLocation ambientSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_AMBIENT);
+    public Identifier ambientSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_AMBIENT);
 
     public Function<Level, Float> ambientSoundVolume = (level) -> 0.5f;
 
@@ -103,7 +103,7 @@ public class PortalLink {
         );
     }
 
-    public boolean canLightInDim(ResourceLocation dim) {
+    public boolean canLightInDim(Identifier dim) {
         if (!onlyIgnitableInReturnDimension) {
             return true;
         }
@@ -144,7 +144,7 @@ public class PortalLink {
     }
 
     public void setTravelSound(
-        ResourceLocation travelSoundLocation,
+        Identifier travelSoundLocation,
         Function<Entity, Float> travelSoundVolume,
         Function<Entity, Float> travelSoundPitch
     ) {
@@ -163,7 +163,7 @@ public class PortalLink {
     }
 
     public void setTriggerSound(
-        ResourceLocation triggerSoundLocation,
+        Identifier triggerSoundLocation,
         Function<Entity, Float> triggerSoundVolume,
         Function<Entity, Float> triggerSoundPitch
     ) {
@@ -173,7 +173,7 @@ public class PortalLink {
     }
 
     public void setAmbientSound(
-        ResourceLocation ambientSoundLocation,
+        Identifier ambientSoundLocation,
         Function<Level, Float> ambientSoundVolume,
         Function<Level, Float> ambientSoundPitch
     ) {

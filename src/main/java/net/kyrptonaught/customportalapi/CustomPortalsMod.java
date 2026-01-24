@@ -2,7 +2,7 @@ package net.kyrptonaught.customportalapi;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -45,7 +45,7 @@ public class CustomPortalsMod {
         )
     );
 
-    public static final HashMap<ResourceLocation, ResourceKey<Level>> dimensions = new HashMap<>();
+    public static final HashMap<Identifier, ResourceKey<Level>> dimensions = new HashMap<>();
 
     public static final ConcurrentHashMap<Block, PortalLink> PORTALS = new ConcurrentHashMap<>();
 

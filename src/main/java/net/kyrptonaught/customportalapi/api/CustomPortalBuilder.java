@@ -3,7 +3,7 @@ package net.kyrptonaught.customportalapi.api;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
@@ -40,11 +40,11 @@ public class CustomPortalBuilder {
     }
 
     /**
-     * Specify a frame block as a {@link ResourceLocation}.
+     * Specify a frame block as a {@link Identifier}.
      *
-     * @param blockLocation ResourceLocation of the Block to be used as the portal's frame block
+     * @param blockLocation Identifier of the Block to be used as the portal's frame block
      */
-    public CustomPortalBuilder frame(ResourceLocation blockLocation) {
+    public CustomPortalBuilder frame(Identifier blockLocation) {
         portalLink.setFrameBlock(BuiltInRegistries.BLOCK.getValue(blockLocation));
         return this;
     }
@@ -62,9 +62,9 @@ public class CustomPortalBuilder {
     /**
      * Specify the destination dimension of the portal.
      *
-     * @param dimensionLocation ResourceLocation of the dimension the portal will teleport to
+     * @param dimensionLocation Identifier of the dimension the portal will teleport to
      */
-    public CustomPortalBuilder destination(ResourceLocation dimensionLocation) {
+    public CustomPortalBuilder destination(Identifier dimensionLocation) {
         portalLink.targetDimensionLocation = dimensionLocation;
         return this;
     }
@@ -110,7 +110,7 @@ public class CustomPortalBuilder {
     /**
      * Specify a custom ignition source to ignite the portal. You must manually trigger the ignition yourself.
      */
-    public CustomPortalBuilder customIgnitionSource(ResourceLocation customSourceLocation) {
+    public CustomPortalBuilder customIgnitionSource(Identifier customSourceLocation) {
         portalLink.ignitionSource = PortalIgnitionSource.fromCustomSource(customSourceLocation);
         return this;
     }
@@ -146,10 +146,10 @@ public class CustomPortalBuilder {
     /**
      * Specify the dimension this portal will return you to.
      *
-     * @param returnDimensionLocation        ResourceLocation of the dimension the portal will return you to
+     * @param returnDimensionLocation        Identifier of the dimension the portal will return you to
      * @param onlyIgnitableInReturnDimension Whether the portal can only be ignited in the return dimension
      */
-    public CustomPortalBuilder returnDimension(ResourceLocation returnDimensionLocation, boolean onlyIgnitableInReturnDimension) {
+    public CustomPortalBuilder returnDimension(Identifier returnDimensionLocation, boolean onlyIgnitableInReturnDimension) {
         portalLink.returnDimensionLocation = returnDimensionLocation;
         portalLink.onlyIgnitableInReturnDimension = onlyIgnitableInReturnDimension;
         return this;
@@ -228,12 +228,12 @@ public class CustomPortalBuilder {
      * Set the sound to be played when the player travels through the portal. Volume and pitch are accepted as functions
      * to allow for dynamic values.
      *
-     * @param travelSoundLocation ResourceLocation of the sound to be played
+     * @param travelSoundLocation Identifier of the sound to be played
      * @param travelSoundVolume   Volume of the sound
      * @param travelSoundPitch    Pitch of the sound
      */
     public CustomPortalBuilder travelSound(
-        ResourceLocation travelSoundLocation,
+        Identifier travelSoundLocation,
         Function<Entity, Float> travelSoundVolume,
         Function<Entity, Float> travelSoundPitch
     ) {
@@ -245,12 +245,12 @@ public class CustomPortalBuilder {
      * Set the sound to be played when the player travels through the portal. Volume and pitch are accepted as functions
      * to allow for dynamic values.
      *
-     * @param triggerSoundLocation ResourceLocation of the sound to be played
+     * @param triggerSoundLocation Identifier of the sound to be played
      * @param triggerSoundVolume   Volume of the sound
      * @param triggerSoundPitch    Pitch of the sound
      */
     public CustomPortalBuilder triggerSound(
-        ResourceLocation triggerSoundLocation,
+        Identifier triggerSoundLocation,
         Function<Entity, Float> triggerSoundVolume,
         Function<Entity, Float> triggerSoundPitch
     ) {
@@ -261,12 +261,12 @@ public class CustomPortalBuilder {
     /**
      * Set the sound to be played randomly while nearby the portal.
      *
-     * @param ambientSoundLocation ResourceLocation of the sound to be played
+     * @param ambientSoundLocation Identifier of the sound to be played
      * @param ambientSoundVolume   Volume of the sound
      * @param ambientSoundPitch    Pitch of the sound
      */
     public CustomPortalBuilder ambientSound(
-        ResourceLocation ambientSoundLocation,
+        Identifier ambientSoundLocation,
         Function<Level, Float> ambientSoundVolume,
         Function<Level, Float> ambientSoundPitch
     ) {

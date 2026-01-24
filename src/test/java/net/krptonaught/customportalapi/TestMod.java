@@ -1,7 +1,7 @@
 package net.krptonaught.customportalapi;
 
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
@@ -21,7 +21,7 @@ public class TestMod {
     public static void createPortals(CustomPortalRegistrationEvent event) {
         CustomPortalBuilder builder = new CustomPortalBuilder()
             .frame(Blocks.GLOWSTONE)
-            .destination(ResourceLocation.withDefaultNamespace("the_nether"))
+            .destination(Identifier.withDefaultNamespace("the_nether"))
             .lightWithFluid(Fluids.WATER)
             .tintColor(255, 0, 255);
 
@@ -29,7 +29,7 @@ public class TestMod {
 
         builder = new CustomPortalBuilder()
             .frame(Blocks.DIAMOND_BLOCK)
-            .destination(ResourceLocation.withDefaultNamespace("the_end"))
+            .destination(Identifier.withDefaultNamespace("the_end"))
             .flatPortal()
             .lightWithItem(Items.DIAMOND)
             .tintColor(0, 255, 255)
