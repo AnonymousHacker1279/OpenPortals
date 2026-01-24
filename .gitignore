@@ -20,5 +20,18 @@ build
 # other
 eclipse
 run
-run-data
-runs
+gradlew.bat
+
+# VS
+.vs
+.vscode
+
+# Caches
+/src/generated/resources/.cache/
+.optimizationCache
+
+# Run configurations
+/runs/
+
+# Token property file, used for publishing
+tokens.properties

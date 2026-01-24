@@ -1,0 +1,20 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "tech.anonymoushacker1279.openportals.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"portal_lighters.AbstractFireMixin",
+		"portal_lighters.FluidBlockPlacedMixin",
+		"portal_lighters.PotionEntityMixin"
+	],
+	"client": [
+      "client.ChunkRendererRegionAccessor",
+      "client.InGameHudMixin",
+      "client.LocalPlayerMixin",
+      "client.PortalManagerAccessor"
+    ],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

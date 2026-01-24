@@ -1,23 +1,25 @@
 plugins {
-    id 'idea'
+    id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version "${neo_moddev}"
-    id 'me.modmuss50.mod-publish-plugin' version "${modmuss50_mod_publish_version}"
-    id 'org.moddedmc.wiki.toolkit' version '0.2.5'
-    id 'com.diffplug.spotless' version "7.0.0.BETA3"
+    id 'net.neoforged.moddev' version '2.0.140'
+    id "com.hypherionmc.modutils.modpublisher" version "2.1.8"
+    id 'idea'
 }
 
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
 
-version = version
+version = mod_version
 group = mod_group_id
 
 base {
-    archivesName = "${mod_id}-neo-${minecraft_version}"
+    archivesName = mod_id
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+println('Java: ' + System.getProperty('java.version') + ' | JVM: ' + System.getProperty('java.vm.version') + ' (' + System.getProperty('java.vendor') + ') | Arch: ' + System.getProperty('os.arch'))
 
 sourceSets {
     main
@@ -26,28 +28,45 @@ sourceSets {
     }
 }
 
-
 neoForge {
-    version = "${neo_version}"
+    version = project.neo_version
     addModdingDependenciesTo sourceSets.test
 
     parchment {
-        minecraftVersion = "${parchment_minecraft}"
-        mappingsVersion = "${parchment_version}"
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
     }
+
+    validateAccessTransformers = true
 
     runs {
         client {
             client()
+            devLogin = true
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
+
         server {
             server()
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
+
+        clientData {
+            clientData()
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
         configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
             logLevel = org.slf4j.event.Level.DEBUG
+
+            // If the selected toolchain is a JBR, enable DCEVM for improved hotswapping
+            if (it.project.javaToolchains.launcherFor(java.toolchain).map { it.metadata.vendor }.getOrElse("").contains("JetBrains")) {
+                jvmArguments.addAll '-XX:+AllowEnhancedClassRedefinition', '-XX:NonProfiledCodeHeapSize=256M', '-XX:ReservedCodeCacheSize=300M'
+            }
+
+            systemProperties.put('terminal.jline', "true")
         }
     }
 
@@ -59,7 +78,10 @@ neoForge {
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
+    exclude ".cache"
+}
 
 repositories {
     mavenLocal()
@@ -68,17 +90,23 @@ repositories {
 dependencies {
 }
 
-tasks.withType(ProcessResources).configureEach {
-    var replaceProperties = [minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
-                             neo_version         : neo_version, neo_version_range: neo_version_range,
-                             loader_version_range: loader_version_range,
-                             mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, version: version,
-                             mod_authors         : mod_authors, mod_description: mod_description, pack_format_number: pack_format_number,]
-    inputs.properties replaceProperties
+tasks.named("processResources", ProcessResources).configure {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_version            : mod_version
+    ]
 
-    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
-        expand replaceProperties + [project: project]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand(replaceProperties)
     }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 java {
@@ -91,109 +119,41 @@ artifacts {
     archives javadocJar
 }
 
-tasks.named('jar', Jar).configure {
-    manifest {
-        attributes(['Specification-Title'     : mod_id,
-                    'Specification-Vendor'    : mod_authors,
-                    'Specification-Version'   : '1', // We are version 1 of ourselves
-                    'Implementation-Title'    : project.name,
-                    'Implementation-Version'  : project.jar.archiveVersion,
-                    'Implementation-Vendor'   : mod_authors,
-                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")])
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-}
-
-wiki {
-    if (file('key.properties').exists()) {
-        def releaseProp = new Properties()
-        File secretPropsFile = file("key.properties")
-        releaseProp.load(secretPropsFile.newInputStream())
-        wikiAccessToken = releaseProp.getProperty("wikiKey")
-    }
-    docs {
-        // The name of the object (examplemod) should match the registered wiki project ID (if it exists).
-        cpapireforged {
-            // The path to the folder containing the documentation metadata file (sinytra-wiki.json)
-            root = file('docs/cpapireforged')
-        }
-    }
+tasks.named('sourcesJar', Jar).configure {
+    from sourceSets.main.allSource
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
     repositories {
         maven {
-            name = "azurelib"
-            url = "https://maven.azuredoom.com/mods"
+            name "AnonymousHacker1279"
+
+            String baseMavenUrl = "https://maven.anonymoushacker1279.tech/"
+            url mod_version.contains("SNAPSHOT") ? baseMavenUrl + "snapshots" : baseMavenUrl + "releases"
+
             credentials(PasswordCredentials)
             authentication {
                 basic(BasicAuthentication)
             }
         }
     }
-    publications {
-        maven(MavenPublication) {
-            artifactId base.archivesName.get()
-            artifact jar
-            artifact sourcesJar
-            artifact javadocJar
-        }
-    }
 }
 
-processResources {
-    doLast {
-        def jsonMinifyStart = System.currentTimeMillis()
-        def jsonMinified = 0
-        def jsonBytesSaved = 0
-        fileTree(dir: outputs.files.asPath, include: '**/*.json').each {
-            File file = it
-            jsonMinified++
-            def oldLength = file.length()
-            file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
-            jsonBytesSaved += oldLength - file.length()
-        }
-        println('Minified ' + jsonMinified + ' json files. Saved ' + jsonBytesSaved + ' bytes. Took ' + (System.currentTimeMillis() - jsonMinifyStart) + 'ms.')
-    }
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
-if (file('key.properties').exists()) {
-    publishMods {
-        def releaseProp = new Properties()
-        File secretPropsFile = file("key.properties")
-        releaseProp.load(secretPropsFile.newInputStream())
-        file = jar.archiveFile
-        changelog = rootProject.file("changelog.md").text
-        type = STABLE
-        modLoaders.add("neoforge")
-
-        curseforge {
-            projectId = project.curseforgeID
-            projectSlug = project.projectSlug
-            accessToken = releaseProp.getProperty("curseKey")
-            minecraftVersions.add(project.minecraft_version)
-        }
-        modrinth {
-            projectId = project.modrinthID
-            accessToken = releaseProp.getProperty('modrinthKey')
-            minecraftVersions.add(project.minecraft_version)
-        }
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
     }
-}
-
-spotless {
-    java {
-        eclipse().configFile("$rootDir/eclipse-formatter.xml")
-        endWithNewline()
-        importOrder("", "java", group.toString(), "\\#")
-        removeUnusedImports()
-        trimTrailingWhitespace()
-    }
-}
-
-tasks.build {
-    dependsOn("spotlessApply")
 }

@@ -1,0 +1,91 @@
+package tech.anonymoushacker1279.openportals.mixin.client;
+
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.block.BlockModelShaper;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.PortalProcessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Portal;
+import net.minecraft.world.level.block.state.BlockState;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import tech.anonymoushacker1279.openportals.CustomPortalBlock;
+import tech.anonymoushacker1279.openportals.OpenPortals;
+import tech.anonymoushacker1279.openportals.util.PortalLink;
+
+@Mixin(Gui.class)
+public class InGameHudMixin {
+
+	@Shadow
+	@Final
+	private Minecraft minecraft;
+
+	@Unique
+	private int openportals$lastColor = -1;
+
+	@ModifyExpressionValue(
+			method = "renderPortalOverlay", at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/util/ARGB;white(F)I"
+	)
+	)
+	public int changeColor(int original) {
+		if (minecraft.player == null) {
+			return original;
+		}
+
+		openportals$isCustomPortal(minecraft.player);
+		return openportals$lastColor >= 0 ? openportals$lastColor : original;
+	}
+
+	@Redirect(
+			method = "renderPortalOverlay", at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/block/BlockModelShaper;getParticleIcon(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;"
+	)
+	)
+	public TextureAtlasSprite renderCustomPortalOverlay(BlockModelShaper blockModels, BlockState blockState) {
+		if (openportals$lastColor >= 0) {
+			return this.minecraft.getBlockRenderer()
+					.getBlockModelShaper()
+					.getParticleIcon(OpenPortals.CUSTOM_PORTAL_BLOCK.get().defaultBlockState());
+		}
+
+		return this.minecraft.getBlockRenderer()
+				.getBlockModelShaper()
+				.getParticleIcon(Blocks.NETHER_PORTAL.defaultBlockState());
+	}
+
+	@Unique
+	private void openportals$isCustomPortal(LocalPlayer player) {
+		PortalProcessor portalManager = player.portalProcess;
+		Portal portalBlock = portalManager != null && portalManager.isInsidePortalThisTick()
+				? ((PortalManagerAccessor) portalManager).getPortal()
+				: null;
+		BlockPos portalPos = portalManager != null && portalManager.isInsidePortalThisTick()
+				? ((PortalManagerAccessor) portalManager).getEntryPosition()
+				: null;
+
+		if (portalBlock == null) {
+			return;
+		}
+
+		if (portalBlock instanceof CustomPortalBlock customportalblock && portalPos != null) {
+			PortalLink link = OpenPortals.getPortalLinkFromBase(customportalblock.getPortalBase(player.level(), portalPos));
+			if (link != null) {
+				openportals$lastColor = link.color;
+				return;
+			}
+		}
+
+		openportals$lastColor = -1;
+	}
+}
