@@ -29,61 +29,43 @@ public class PortalLink {
 
 	@Nullable
 	private Block frameBlock;
-
 	public PortalIgnitionSource ignitionSource = PortalIgnitionSource.FIRE;
-
 	public CustomPortalBlock portalBlock = OpenPortals.CUSTOM_PORTAL_BLOCK.get();
-
 	public Identifier targetDimensionLocation = Identifier.withDefaultNamespace("nether");
-
 	public Identifier returnDimensionLocation = Identifier.withDefaultNamespace("overworld");
-
 	public boolean onlyIgnitableInReturnDimension = false;
-
 	public int color;
-
 	public int strictWidth, strictHeight;
-
-	public int portalSearchYBottom, portalSearchYTop = Integer.MIN_VALUE;
-
-	public int returnPortalSearchYBottom, returnPortalSearchYTop = Integer.MIN_VALUE;
-
+	public int portalSearchYBottom = Integer.MIN_VALUE;
+	public int portalSearchYTop = Integer.MIN_VALUE;
+	public int returnPortalSearchYBottom = Integer.MIN_VALUE;
+	public int returnPortalSearchYTop = Integer.MIN_VALUE;
 	public PortalFrameTester portalFrameTester = new VanillaPortalFrameTester();
-
 	private Consumer<Entity> postTeleportEvent = entity -> {
 	};
-
 	private Function<Entity, Boolean> preTeleportEvent = entity -> true;
-
 	private BiFunction<BlockPos, PortalIgnitionSource, Boolean> prePortalIgniteEvent = (portalPos, source) -> true;
-
 	private BiConsumer<BlockPos, PortalIgnitionSource> postPortalIgniteEvent = (portalPos, source) -> {
 	};
 
 	@Nullable
 	private Identifier travelSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_TRAVEL);
-
 	private Function<Entity, Float> travelSoundVolume = (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F;
-
 	private Function<Entity, Float> travelSoundPitch = (entity) -> 0.25f;
 
 	@Nullable
 	public Identifier triggerSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_TRIGGER);
-
 	public Function<Entity, Float> triggerSoundVolume = (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F;
-
 	public Function<Entity, Float> triggerSoundPitch = (entity) -> 0.25f;
 
 	@Nullable
 	public Identifier ambientSoundLocation = BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_AMBIENT);
-
 	public Function<Level, Float> ambientSoundVolume = (level) -> 0.5f;
-
 	public Function<Level, Float> ambientSoundPitch = (level) -> level.random.nextFloat() * 0.4F + 0.8F;
 
 	public BiFunction<Level, BlockPos, ParticleOptions> portalParticle = (level, pos) -> new BlockParticleOption(
 			ParticleTypes.BLOCK,
-			CustomPortalHelper.getPortalBaseDefault(level, pos).defaultBlockState()
+			PortalUtils.getPortalBaseDefault(level, pos).defaultBlockState()
 	);
 
 	public Block getFrameBlock() {

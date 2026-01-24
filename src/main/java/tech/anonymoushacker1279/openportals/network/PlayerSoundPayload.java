@@ -7,11 +7,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import tech.anonymoushacker1279.openportals.OpenPortals;
 
-public record PlayerSoundPayload(
-		Identifier location,
-		float volume,
-		float pitch
-) implements CustomPacketPayload {
+public record PlayerSoundPayload(Identifier location, float volume, float pitch) implements CustomPacketPayload {
 
 	public static final Type<PlayerSoundPayload> TYPE = new Type<>(
 			Identifier.fromNamespaceAndPath(OpenPortals.MOD_ID, "local_sound")

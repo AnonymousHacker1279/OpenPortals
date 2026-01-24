@@ -16,9 +16,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import tech.anonymoushacker1279.openportals.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.OpenPortals;
 import tech.anonymoushacker1279.openportals.portal.PortalIgnitionSource;
-import tech.anonymoushacker1279.openportals.util.CustomPortalHelper;
 import tech.anonymoushacker1279.openportals.util.PortalLink;
 
 import java.util.HashSet;
@@ -29,24 +29,21 @@ public abstract class PortalFrameTester {
 
 	@Nullable
 	public BlockPos lowerCorner;
-
 	protected HashSet<Block> VALID_FRAME = new HashSet<>();
-
 	protected int foundPortalBlocks;
-
 	protected LevelAccessor levelAccessor;
 
 	public static boolean validStateInsidePortal(BlockState blockState, HashSet<Block> foundations) {
 		PortalIgnitionSource ignitionSource = PortalIgnitionSource.FIRE;
 		for (Block block : foundations) {
-			PortalLink link = OpenPortals.getPortalLinkFromBase(block);
+			PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(block);
 			if (link != null) {
 				ignitionSource = link.ignitionSource;
 				break;
 			}
 		}
 
-		if (blockState.isAir() || CustomPortalHelper.isInstanceOfCustomPortal(blockState)) {
+		if (blockState.isAir() || blockState.getBlock() instanceof CustomPortalBlock) {
 			return true;
 		}
 		if (ignitionSource == PortalIgnitionSource.FIRE) {
@@ -69,13 +66,9 @@ public abstract class PortalFrameTester {
 
 	public abstract Optional<PortalFrameTester> getNewPortal(LevelAccessor level, BlockPos blockPos, Axis axis, Block... foundations);
 
-	public abstract Optional<PortalFrameTester> getOrEmpty(
-			LevelAccessor level,
-			BlockPos blockPos,
-			Predicate<PortalFrameTester> predicate,
-			Direction.Axis axis,
-			Block... foundations
-	);
+	public abstract Optional<PortalFrameTester> getOrEmpty(LevelAccessor level, BlockPos blockPos,
+	                                                       Predicate<PortalFrameTester> predicate, Direction.Axis axis,
+	                                                       Block... foundations);
 
 	public abstract boolean isAlreadyLitPortalFrame();
 
@@ -93,7 +86,7 @@ public abstract class PortalFrameTester {
 	@Nullable
 	public abstract BlockPos doesPortalFitAt(Level level, BlockPos attemptPos, Direction.Axis axis);
 
-	public abstract Vec3 getEntityOffsetInPortal(BlockUtil.FoundRectangle arg, Entity entity, Direction.Axis portalAxis);
+	public abstract Vec3 getEntityOffsetInPortal(BlockUtil.FoundRectangle arg, Entity entity);
 
 	public abstract TeleportTransition getTPTargetInPortal(
 			ServerLevel serverLevel,
@@ -193,14 +186,17 @@ public abstract class PortalFrameTester {
 
 		for (int i = 0; i < size1; i++) {
 			for (int j = 0; j < size2; j++) {
-				if (
-						CustomPortalHelper.isInstanceOfCustomPortal(
-								levelAccessor.getBlockState(lowerCorner.relative(axis1, i).relative(axis2, j))
-						)
-				) {
+				if (levelAccessor.getBlockState(lowerCorner.relative(axis1, i).relative(axis2, j)).getBlock() instanceof CustomPortalBlock) {
 					foundPortalBlocks++;
 				}
 			}
 		}
+	}
+
+	protected BlockState blockWithAxis(BlockState state, Direction.Axis axis) {
+		if (state.getBlock() instanceof CustomPortalBlock) {
+			return state.setValue(CustomPortalBlock.AXIS, axis);
+		}
+		return state;
 	}
 }

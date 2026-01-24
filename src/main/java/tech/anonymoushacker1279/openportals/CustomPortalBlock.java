@@ -25,18 +25,15 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import tech.anonymoushacker1279.openportals.portal.frame.PortalFrameTester;
-import tech.anonymoushacker1279.openportals.util.CustomPortalHelper;
 import tech.anonymoushacker1279.openportals.util.CustomTeleporter;
 import tech.anonymoushacker1279.openportals.util.PortalLink;
+import tech.anonymoushacker1279.openportals.util.PortalUtils;
 
 public class CustomPortalBlock extends Block implements Portal {
 
 	public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
-
 	protected static final VoxelShape X_SHAPE = Block.box(0.0D, 0.0D, 6.0D, 16.0D, 16.0D, 10.0D);
-
 	protected static final VoxelShape Z_SHAPE = Block.box(6.0D, 0.0D, 0.0D, 10.0D, 16.0D, 16.0D);
-
 	protected static final VoxelShape Y_SHAPE = Block.box(0.0D, 6.0D, 0.0D, 16.0D, 10.0D, 16.0D);
 
 	public CustomPortalBlock(Properties properties) {
@@ -59,21 +56,17 @@ public class CustomPortalBlock extends Block implements Portal {
 	}
 
 	@Override
-	protected BlockState updateShape(
-			BlockState state,
-			LevelReader level,
-			ScheduledTickAccess scheduledTickAccess,
-			BlockPos pos,
-			Direction direction,
-			BlockPos neighborPos,
-			BlockState neighborState,
-			RandomSource random
-	) {
+	protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos,
+	                                 Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+
 		Block portalBase = getPortalBase((Level) level, pos);
-		PortalLink link = OpenPortals.getPortalLinkFromBase(portalBase);
+		PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(portalBase);
 		if (link != null) {
-			PortalFrameTester portalFrameTester = link.getFrameTester()
-					.init((LevelAccessor) level, pos, CustomPortalHelper.getAxisFrom(state), portalBase);
+			PortalFrameTester portalFrameTester = link.getFrameTester().init((LevelAccessor) level,
+					pos,
+					PortalUtils.getAxisFrom(state),
+					portalBase);
+
 			if (portalFrameTester.isAlreadyLitPortalFrame()) {
 				return super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
 			}
@@ -90,7 +83,7 @@ public class CustomPortalBlock extends Block implements Portal {
 	@Override
 	public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
 		Block portalBase = getPortalBase(level, pos);
-		PortalLink link = OpenPortals.getPortalLinkFromBase(portalBase);
+		PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(portalBase);
 
 		if (link == null) {
 			return;
@@ -133,14 +126,7 @@ public class CustomPortalBlock extends Block implements Portal {
 	}
 
 	@Override
-	protected void entityInside(
-			BlockState state,
-			Level level,
-			BlockPos pos,
-			Entity entity,
-			InsideBlockEffectApplier applier,
-			boolean intersects
-	) {
+	protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
 		if (entity.canUsePortal(false)) {
 			entity.setAsInsidePortal(this, pos);
 		}
@@ -151,7 +137,9 @@ public class CustomPortalBlock extends Block implements Portal {
 		if (entity instanceof Player playerEntity) {
 			return Math.max(
 					1,
-					playerEntity.isCreative() ? level.getGameRules().get(GameRules.PLAYERS_NETHER_PORTAL_CREATIVE_DELAY) : level.getGameRules().get(GameRules.PLAYERS_NETHER_PORTAL_DEFAULT_DELAY)
+					playerEntity.isCreative()
+							? level.getGameRules().get(GameRules.PLAYERS_NETHER_PORTAL_CREATIVE_DELAY)
+							: level.getGameRules().get(GameRules.PLAYERS_NETHER_PORTAL_DEFAULT_DELAY)
 			);
 		}
 
@@ -159,7 +147,7 @@ public class CustomPortalBlock extends Block implements Portal {
 	}
 
 	public Block getPortalBase(Level level, BlockPos pos) {
-		return CustomPortalHelper.getPortalBaseDefault(level, pos);
+		return PortalUtils.getPortalBaseDefault(level, pos);
 	}
 
 	@Override

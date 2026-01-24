@@ -36,7 +36,7 @@ public class CustomTeleporter {
 	 */
 	@Nullable
 	public static TeleportTransition attemptTeleport(Level level, Entity entity, Block portalBase, BlockPos portalPos) {
-		PortalLink link = OpenPortals.getPortalLinkFromBase(portalBase);
+		PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(portalBase);
 		if (link == null) {
 			return null;
 		}
@@ -45,9 +45,9 @@ public class CustomTeleporter {
 			return null; // The entity was denied teleportation
 		}
 
-		ResourceKey<Level> destinationKey = level.dimension() == OpenPortals.dimensions.get(link.targetDimensionLocation)
-				? OpenPortals.dimensions.get(link.returnDimensionLocation)
-				: OpenPortals.dimensions.get(link.targetDimensionLocation);
+		ResourceKey<Level> destinationKey = level.dimension() == OpenPortals.getPortalManager().getDimensionKey(link.targetDimensionLocation)
+				? OpenPortals.getPortalManager().getDimensionKey(link.returnDimensionLocation)
+				: OpenPortals.getPortalManager().getDimensionKey(link.targetDimensionLocation);
 
 		ServerLevel destination = ((ServerLevel) level).getServer().getLevel(destinationKey);
 		if (destination == null) {
@@ -72,19 +72,14 @@ public class CustomTeleporter {
 	 * @return a TeleportTransition object if the teleportation can be performed, or null if it cannot
 	 */
 	@Nullable
-	private static TeleportTransition createCustomTeleportTarget(
-			ServerLevel destinationLevel,
-			Entity entity,
-			BlockPos enteredPortalPos,
-			Block frameBlock,
-			PortalLink link,
-			PortalFrameTester frameTester
-	) {
-		if (OpenPortals.portalLinkingStorage == null) {
+	private static TeleportTransition createCustomTeleportTarget(ServerLevel destinationLevel, Entity entity, BlockPos enteredPortalPos,
+	                                                             Block frameBlock, PortalLink link, PortalFrameTester frameTester) {
+
+		if (OpenPortals.getPortalManager().getStorage() == null) {
 			return null;
 		}
 
-		Direction.Axis portalAxis = CustomPortalHelper.getAxisFrom(entity.level().getBlockState(enteredPortalPos));
+		Direction.Axis portalAxis = PortalUtils.getAxisFrom(entity.level().getBlockState(enteredPortalPos));
 		BlockUtil.FoundRectangle fromPortalRectangle = frameTester
 				.init(entity.level(), enteredPortalPos, portalAxis, frameBlock)
 				.getRectangle();
@@ -93,7 +88,7 @@ public class CustomTeleporter {
 			return null;
 		}
 
-		DimensionalBlockPos destinationPos = OpenPortals.portalLinkingStorage.getDestination(
+		DimensionalBlockPos destinationPos = OpenPortals.getPortalManager().getStorage().getDestination(
 				fromPortalRectangle.minCorner,
 				entity.level().dimension()
 		);
@@ -109,7 +104,7 @@ public class CustomTeleporter {
 						destinationLevel,
 						portalFrameTester.getRectangle(),
 						portalAxis,
-						portalFrameTester.getEntityOffsetInPortal(fromPortalRectangle, entity, portalAxis),
+						portalFrameTester.getEntityOffsetInPortal(fromPortalRectangle, entity),
 						entity,
 						link
 				);
@@ -130,15 +125,10 @@ public class CustomTeleporter {
 	 * @return a TeleportTransition object if the teleportation can be performed, or null if it cannot
 	 */
 	@Nullable
-	private static TeleportTransition createDestinationPortal(
-			ServerLevel destination,
-			Entity entity,
-			Direction.Axis axis,
-			BlockUtil.FoundRectangle portalFramePos,
-			BlockState frameBlock,
-			PortalLink link
-	) {
-		if (OpenPortals.portalLinkingStorage == null) {
+	private static TeleportTransition createDestinationPortal(ServerLevel destination, Entity entity, Direction.Axis axis,
+	                                                          BlockUtil.FoundRectangle portalFramePos, BlockState frameBlock, PortalLink link) {
+
+		if (OpenPortals.getPortalManager().getStorage() == null) {
 			return null;
 		}
 
@@ -159,7 +149,7 @@ public class CustomTeleporter {
 		if (portal.isPresent()) {
 			PortalFrameTester portalFrameTester = link.getFrameTester();
 
-			OpenPortals.portalLinkingStorage.createLink(
+			OpenPortals.getPortalManager().getStorage().createLink(
 					portalFramePos.minCorner,
 					entity.level().dimension(),
 					portal.get().minCorner,
@@ -169,7 +159,7 @@ public class CustomTeleporter {
 					destination,
 					portal.get(),
 					axis,
-					portalFrameTester.getEntityOffsetInPortal(portalFramePos, entity, axis),
+					portalFrameTester.getEntityOffsetInPortal(portalFramePos, entity),
 					entity,
 					link
 			);
@@ -207,16 +197,11 @@ public class CustomTeleporter {
 	 * @param blockPos    the position where the portal should be built
 	 * @param frameBlock  the block that serves as the frame of the portal
 	 * @param axis        the axis of the portal
-	 * @param link
+	 * @param link 	  the portal link containing configuration data
 	 * @return an Optional containing the found rectangle of the portal if successful, or empty if not
 	 */
-	public static Optional<BlockUtil.FoundRectangle> buildDestinationPortal(
-			ServerLevel serverLevel,
-			BlockPos blockPos,
-			BlockState frameBlock,
-			Direction.Axis axis,
-			PortalLink link
-	) {
+	public static Optional<BlockUtil.FoundRectangle> buildDestinationPortal(ServerLevel serverLevel, BlockPos blockPos,
+	                                                                        BlockState frameBlock, Direction.Axis axis, PortalLink link) {
 		PortalFrameTester portalFrameTester = link.getFrameTester();
 
 		int topY = Math.min(serverLevel.getMaxY(), serverLevel.getMinY() + serverLevel.getLogicalHeight()) - 5;

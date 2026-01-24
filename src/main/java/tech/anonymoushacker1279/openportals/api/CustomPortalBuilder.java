@@ -35,7 +35,7 @@ public class CustomPortalBuilder {
 	 * portal.
 	 */
 	public void build() {
-		OpenPortals.addPortal(portalLink.getFrameBlock(), portalLink);
+		OpenPortals.getPortalManager().addPortal(portalLink.getFrameBlock(), portalLink);
 	}
 
 	/**
@@ -231,11 +231,7 @@ public class CustomPortalBuilder {
 	 * @param travelSoundVolume   Volume of the sound
 	 * @param travelSoundPitch    Pitch of the sound
 	 */
-	public CustomPortalBuilder travelSound(
-			Identifier travelSoundLocation,
-			Function<Entity, Float> travelSoundVolume,
-			Function<Entity, Float> travelSoundPitch
-	) {
+	public CustomPortalBuilder travelSound(Identifier travelSoundLocation, Function<Entity, Float> travelSoundVolume, Function<Entity, Float> travelSoundPitch) {
 		portalLink.setTravelSound(travelSoundLocation, travelSoundVolume, travelSoundPitch);
 		return this;
 	}
@@ -248,11 +244,7 @@ public class CustomPortalBuilder {
 	 * @param triggerSoundVolume   Volume of the sound
 	 * @param triggerSoundPitch    Pitch of the sound
 	 */
-	public CustomPortalBuilder triggerSound(
-			Identifier triggerSoundLocation,
-			Function<Entity, Float> triggerSoundVolume,
-			Function<Entity, Float> triggerSoundPitch
-	) {
+	public CustomPortalBuilder triggerSound(Identifier triggerSoundLocation, Function<Entity, Float> triggerSoundVolume, Function<Entity, Float> triggerSoundPitch) {
 		portalLink.setTriggerSound(triggerSoundLocation, triggerSoundVolume, triggerSoundPitch);
 		return this;
 	}
@@ -264,11 +256,7 @@ public class CustomPortalBuilder {
 	 * @param ambientSoundVolume   Volume of the sound
 	 * @param ambientSoundPitch    Pitch of the sound
 	 */
-	public CustomPortalBuilder ambientSound(
-			Identifier ambientSoundLocation,
-			Function<Level, Float> ambientSoundVolume,
-			Function<Level, Float> ambientSoundPitch
-	) {
+	public CustomPortalBuilder ambientSound(Identifier ambientSoundLocation, Function<Level, Float> ambientSoundVolume, Function<Level, Float> ambientSoundPitch) {
 		portalLink.setAmbientSound(ambientSoundLocation, ambientSoundVolume, ambientSoundPitch);
 		return this;
 	}

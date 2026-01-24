@@ -19,12 +19,7 @@ import tech.anonymoushacker1279.openportals.util.PortalLink;
 @Mixin(LocalPlayer.class)
 public class LocalPlayerMixin {
 
-	@ModifyArg(
-			method = "handlePortalTransitionEffect", at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)Lnet/minecraft/client/sounds/SoundEngine$PlayResult;"
-	)
-	)
+	@ModifyArg(method = "handlePortalTransitionEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)Lnet/minecraft/client/sounds/SoundEngine$PlayResult;"))
 	public SoundInstance playSound(SoundInstance original) {
 		SoundInstance triggerSound = openportals$getTriggerSound((LocalPlayer) (Object) this);
 		if (triggerSound != null) {
@@ -39,10 +34,10 @@ public class LocalPlayerMixin {
 	private SoundInstance openportals$getTriggerSound(LocalPlayer player) {
 		PortalProcessor portalManager = player.portalProcess;
 		Portal portalBlock = portalManager != null && portalManager.isInsidePortalThisTick()
-				? ((PortalManagerAccessor) portalManager).getPortal()
+				? portalManager.portal
 				: null;
 		BlockPos portalPos = portalManager != null && portalManager.isInsidePortalThisTick()
-				? ((PortalManagerAccessor) portalManager).getEntryPosition()
+				? portalManager.getEntryPosition()
 				: null;
 
 		if (portalBlock == null) {
@@ -50,7 +45,7 @@ public class LocalPlayerMixin {
 		}
 
 		if (portalBlock instanceof CustomPortalBlock customportalblock && portalPos != null) {
-			PortalLink link = OpenPortals.getPortalLinkFromBase(customportalblock.getPortalBase(player.level(), portalPos));
+			PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(customportalblock.getPortalBase(player.level(), portalPos));
 			if (link != null && link.triggerSoundLocation != null) {
 				return SimpleSoundInstance.forLocalAmbience(
 						BuiltInRegistries.SOUND_EVENT.get(link.triggerSoundLocation).orElseThrow().value(),

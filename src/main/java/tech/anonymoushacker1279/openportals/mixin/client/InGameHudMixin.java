@@ -31,12 +31,7 @@ public class InGameHudMixin {
 	@Unique
 	private int openportals$lastColor = -1;
 
-	@ModifyExpressionValue(
-			method = "renderPortalOverlay", at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/util/ARGB;white(F)I"
-	)
-	)
+	@ModifyExpressionValue(method = "renderPortalOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;white(F)I"))
 	public int changeColor(int original) {
 		if (minecraft.player == null) {
 			return original;
@@ -46,12 +41,7 @@ public class InGameHudMixin {
 		return openportals$lastColor >= 0 ? openportals$lastColor : original;
 	}
 
-	@Redirect(
-			method = "renderPortalOverlay", at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/renderer/block/BlockModelShaper;getParticleIcon(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;"
-	)
-	)
+	@Redirect(method = "renderPortalOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/BlockModelShaper;getParticleIcon(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;"))
 	public TextureAtlasSprite renderCustomPortalOverlay(BlockModelShaper blockModels, BlockState blockState) {
 		if (openportals$lastColor >= 0) {
 			return this.minecraft.getBlockRenderer()
@@ -68,10 +58,10 @@ public class InGameHudMixin {
 	private void openportals$isCustomPortal(LocalPlayer player) {
 		PortalProcessor portalManager = player.portalProcess;
 		Portal portalBlock = portalManager != null && portalManager.isInsidePortalThisTick()
-				? ((PortalManagerAccessor) portalManager).getPortal()
+				? portalManager.portal
 				: null;
 		BlockPos portalPos = portalManager != null && portalManager.isInsidePortalThisTick()
-				? ((PortalManagerAccessor) portalManager).getEntryPosition()
+				? portalManager.getEntryPosition()
 				: null;
 
 		if (portalBlock == null) {
@@ -79,7 +69,7 @@ public class InGameHudMixin {
 		}
 
 		if (portalBlock instanceof CustomPortalBlock customportalblock && portalPos != null) {
-			PortalLink link = OpenPortals.getPortalLinkFromBase(customportalblock.getPortalBase(player.level(), portalPos));
+			PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(customportalblock.getPortalBase(player.level(), portalPos));
 			if (link != null) {
 				openportals$lastColor = link.color;
 				return;

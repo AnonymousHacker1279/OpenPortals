@@ -1,6 +1,6 @@
 package tech.anonymoushacker1279.openportals.event;
 
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -22,14 +22,10 @@ public class NeoEventSubscriber {
 
 	@SubscribeEvent
 	public static void onServerStart(ServerStartedEvent event) {
-		for (ResourceKey<Level> registryKey : event.getServer().levelKeys()) {
-			OpenPortals.dimensions.put(registryKey.identifier(), registryKey);
-		}
-
-		OpenPortals.portalLinkingStorage = event.getServer()
-				.overworld()
+		OpenPortals.getPortalManager().populateDimensions(event.getServer().levelKeys());
+		OpenPortals.getPortalManager().setStorage(event.getServer().overworld()
 				.getDataStorage()
-				.computeIfAbsent(PortalLinkingStorage.TYPE);
+				.computeIfAbsent(PortalLinkingStorage.TYPE));
 	}
 
 	@SubscribeEvent
@@ -45,13 +41,10 @@ public class NeoEventSubscriber {
 				HitResult hit = player.pick(6, 1, false);
 				if (hit.getType() == HitResult.Type.BLOCK) {
 					BlockHitResult blockHit = (BlockHitResult) hit;
-					if (
-							PortalIgniter.attemptPortalLight(
-									level,
-									blockHit.getBlockPos().relative(blockHit.getDirection()),
-									PortalIgnitionSource.fromItem(item).withPlayer(player)
-							)
-					) {
+					if (PortalIgniter.attemptPortalLight(level,
+							blockHit.getBlockPos().relative(blockHit.getDirection()),
+							PortalIgnitionSource.fromItem(item).withPlayer(player))) {
+
 						event.setCanceled(true);
 					}
 				}

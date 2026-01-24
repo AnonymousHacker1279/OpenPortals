@@ -9,11 +9,9 @@
 		"portal_lighters.PotionEntityMixin"
 	],
 	"client": [
-      "client.ChunkRendererRegionAccessor",
-      "client.InGameHudMixin",
-      "client.LocalPlayerMixin",
-      "client.PortalManagerAccessor"
-    ],
+		"client.InGameHudMixin",
+		"client.LocalPlayerMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	}

@@ -22,7 +22,7 @@ public class PortalLinkingStorage extends SavedData {
 	);
 
 	public static final SavedDataType<PortalLinkingStorage> TYPE = new SavedDataType<>(
-			"customopenportals_dimension_links",
+			"openportals_dimension_links",
 			PortalLinkingStorage::new,
 			CODEC,
 			null

@@ -1,6 +1,5 @@
 ![OpenPortals Logo](logo.png)
 
-# OpenPortals for Minecraft
 ## A simple-to-use library for implementing custom dimension portals.
 
 OpenPortals is a lightweight library mod that makes it easy to create custom portals. It's ideal for 
@@ -41,3 +40,7 @@ public static void onCommonStartUp(FMLCommonSetupEvent event) {
 ```
 
 All portal builder methods are documented, so refer to the Javadocs for additional information.
+
+## License
+
+OpenPortals is [MIT licensed](LICENSE).

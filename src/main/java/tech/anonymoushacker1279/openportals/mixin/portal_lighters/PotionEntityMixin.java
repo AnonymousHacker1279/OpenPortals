@@ -15,8 +15,8 @@ import tech.anonymoushacker1279.openportals.portal.PortalIgnitionSource;
 @Mixin(AbstractThrownPotion.class)
 public abstract class PotionEntityMixin extends ThrowableItemProjectile {
 
-	public PotionEntityMixin(EntityType<? extends ThrowableItemProjectile> entityType, Level world) {
-		super(entityType, world);
+	public PotionEntityMixin(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
+		super(entityType, level);
 	}
 
 	@Inject(method = "dowseFire", at = @At("HEAD"))

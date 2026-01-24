@@ -15,19 +15,9 @@ import tech.anonymoushacker1279.openportals.portal.PortalIgnitionSource;
 public abstract class FluidBlockPlacedMixin {
 
 	@Inject(method = "onPlace", at = @At("HEAD"))
-	public void fluidPlacedAttemptPortalLight(
-			BlockState state,
-			Level world,
-			BlockPos pos,
-			BlockState oldState,
-			boolean notify,
-			CallbackInfo ci
-	) {
-		if (state.getFluidState().isSource())
-			PortalIgniter.attemptPortalLight(
-					world,
-					pos,
-					PortalIgnitionSource.fromFluid(state.getFluidState().getType())
-			);
+	public void fluidPlacedAttemptPortalLight(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean notify, CallbackInfo ci) {
+		if (state.getFluidState().isSource()) {
+			PortalIgniter.attemptPortalLight(level, pos, PortalIgnitionSource.fromFluid(state.getFluidState().getType()));
+		}
 	}
 }

@@ -9,10 +9,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
  * @param fromPos The starting position of the link.
  * @param toPos   The ending position of the link.
  */
-public record DimensionLink(
-		DimensionalBlockPos fromPos,
-		DimensionalBlockPos toPos
-) {
+public record DimensionLink(DimensionalBlockPos fromPos, DimensionalBlockPos toPos) {
 
 	public static final Codec<DimensionLink> CODEC = RecordCodecBuilder.create(
 			instance -> instance.group(

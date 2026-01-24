@@ -6,10 +6,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import tech.anonymoushacker1279.openportals.OpenPortals;
 import tech.anonymoushacker1279.openportals.portal.frame.PortalFrameTester;
-import tech.anonymoushacker1279.openportals.util.CustomPortalHelper;
 import tech.anonymoushacker1279.openportals.util.PortalLink;
 
 import java.util.Optional;
+
+import static tech.anonymoushacker1279.openportals.util.PortalUtils.isInstanceOfPortalFrame;
 
 public class PortalIgniter {
 
@@ -22,7 +23,28 @@ public class PortalIgniter {
 	 * @return true if the portal was successfully lit, false otherwise
 	 */
 	public static boolean attemptPortalLight(Level level, BlockPos portalPos, PortalIgnitionSource ignitionSource) {
-		return attemptPortalLight(level, portalPos, CustomPortalHelper.getClosestFrameBlock(level, portalPos), ignitionSource);
+		BlockPos framePos = portalPos;
+
+		if (isInstanceOfPortalFrame(level, portalPos.below())) {
+			framePos = portalPos.below();
+		}
+		if (isInstanceOfPortalFrame(level, portalPos.east())) {
+			framePos = portalPos.east();
+		}
+		if (isInstanceOfPortalFrame(level, portalPos.west())) {
+			framePos = portalPos.west();
+		}
+		if (isInstanceOfPortalFrame(level, portalPos.north())) {
+			framePos = portalPos.north();
+		}
+		if (isInstanceOfPortalFrame(level, portalPos.south())) {
+			framePos = portalPos.south();
+		}
+		if (isInstanceOfPortalFrame(level, portalPos.above())) {
+			framePos = portalPos.above();
+		}
+
+		return attemptPortalLight(level, portalPos, framePos, ignitionSource);
 	}
 
 	/**
@@ -36,7 +58,7 @@ public class PortalIgniter {
 	 */
 	public static boolean attemptPortalLight(Level level, BlockPos portalPos, BlockPos framePos, PortalIgnitionSource ignitionSource) {
 		Block foundationBlock = level.getBlockState(framePos).getBlock();
-		PortalLink link = OpenPortals.getPortalLinkFromBase(foundationBlock);
+		PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(foundationBlock);
 
 		if (link == null || !link.doesIgnitionMatch(ignitionSource) || !link.canLightInDim(level.dimension().identifier())) {
 			return false;
@@ -55,21 +77,12 @@ public class PortalIgniter {
 	 * @param ignitionSource  the source of ignition for the portal
 	 * @return true if the portal was successfully lit, false otherwise
 	 */
-	private static boolean attemptToLightPortal(
-			PortalLink link,
-			Level level,
-			BlockPos pos,
-			Block foundationBlock,
-			PortalIgnitionSource ignitionSource
-	) {
+	private static boolean attemptToLightPortal(PortalLink link, Level level, BlockPos pos, Block foundationBlock, PortalIgnitionSource ignitionSource) {
 		Optional<PortalFrameTester> optional = link.getFrameTester().getNewPortal(level, pos, Direction.Axis.X, foundationBlock);
 
 		// Check for valid frame and correct size (if applicable)
 		if (optional.isPresent()) {
-			if (
-					optional.get().isRequestedSize(link.strictWidth, link.strictHeight) && link.getPrePortalIgniteEvent()
-							.apply(pos, ignitionSource)
-			) {
+			if (optional.get().isRequestedSize(link.strictWidth, link.strictHeight) && link.getPrePortalIgniteEvent().apply(pos, ignitionSource)) {
 				optional.get().lightPortal(foundationBlock);
 				link.getPostPortalIgniteEvent().accept(pos, ignitionSource);
 			}

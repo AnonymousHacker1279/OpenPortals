@@ -11,10 +11,7 @@ import net.minecraft.resources.Identifier;
  * @param dimension The dimension of the block position.
  * @param pos       The block position.
  */
-public record DimensionalBlockPos(
-		Identifier dimension,
-		BlockPos pos
-) {
+public record DimensionalBlockPos(Identifier dimension, BlockPos pos) {
 
 	public static final Codec<DimensionalBlockPos> CODEC = RecordCodecBuilder.create(
 			instance -> instance.group(

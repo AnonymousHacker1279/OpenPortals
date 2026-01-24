@@ -16,7 +16,8 @@ public class AbstractFireMixin {
 
 	@Inject(method = "onPlace", at = @At("HEAD"), cancellable = true)
 	public void detectCustomPortal(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify, CallbackInfo ci) {
-		if (PortalIgniter.attemptPortalLight(world, pos, PortalIgnitionSource.FIRE))
+		if (PortalIgniter.attemptPortalLight(world, pos, PortalIgnitionSource.FIRE)) {
 			ci.cancel();
+		}
 	}
 }
