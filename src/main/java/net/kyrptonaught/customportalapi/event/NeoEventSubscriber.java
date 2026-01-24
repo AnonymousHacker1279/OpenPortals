@@ -24,7 +24,7 @@ public class NeoEventSubscriber {
     @SubscribeEvent
     public static void onServerStart(ServerStartedEvent event) {
         for (ResourceKey<Level> registryKey : event.getServer().levelKeys()) {
-            CustomPortalsMod.dimensions.put(registryKey.location(), registryKey);
+            CustomPortalsMod.dimensions.put(registryKey.identifier(), registryKey);
         }
 
         CustomPortalsMod.portalLinkingStorage = event.getServer()

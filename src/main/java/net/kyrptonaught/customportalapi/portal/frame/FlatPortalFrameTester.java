@@ -1,12 +1,11 @@
 package net.kyrptonaught.customportalapi.portal.frame;
 
 import com.google.common.collect.Sets;
-import net.minecraft.BlockUtil;
-import net.minecraft.BlockUtil.FoundRectangle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.BlockUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -196,7 +195,7 @@ public class FlatPortalFrameTester extends PortalFrameTester {
     @Override
     public TeleportTransition getTPTargetInPortal(
         ServerLevel serverLevel,
-        FoundRectangle portalRect,
+        BlockUtil.FoundRectangle portalRect,
         Axis portalAxis,
         Vec3 prevOffset,
         Entity entity,

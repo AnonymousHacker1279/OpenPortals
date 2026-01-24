@@ -1,10 +1,10 @@
 package net.kyrptonaught.customportalapi.util;
 
-import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.BlockUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -99,7 +99,7 @@ public class CustomTeleporter {
             entity.level().dimension()
         );
 
-        if (destinationPos != null && destinationPos.dimension().equals(destinationLevel.dimension().location())) {
+        if (destinationPos != null && destinationPos.dimension().equals(destinationLevel.dimension().identifier())) {
             PortalFrameTester portalFrameTester = frameTester.init(destinationLevel, destinationPos.pos(), portalAxis, frameBlock);
             if (portalFrameTester.isValidFrame() && portalFrameTester.getRectangle() != null) {
                 if (!portalFrameTester.isAlreadyLitPortalFrame()) {
@@ -223,7 +223,7 @@ public class CustomTeleporter {
         int topY = Math.min(serverLevel.getMaxY(), serverLevel.getMinY() + serverLevel.getLogicalHeight()) - 5;
         int bottomY = serverLevel.getMinY() + 5;
 
-        if (serverLevel.dimension().location().equals(link.targetDimensionLocation)) {
+        if (serverLevel.dimension().identifier().equals(link.targetDimensionLocation)) {
             if (link.portalSearchYTop != Integer.MIN_VALUE) {
                 topY = link.portalSearchYTop;
             }

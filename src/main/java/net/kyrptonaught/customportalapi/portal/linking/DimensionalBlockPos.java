@@ -3,7 +3,7 @@ package net.kyrptonaught.customportalapi.portal.linking;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Represents a block position in a specific dimension.
@@ -12,13 +12,13 @@ import net.minecraft.resources.ResourceLocation;
  * @param pos       The block position.
  */
 public record DimensionalBlockPos(
-    ResourceLocation dimension,
+    Identifier dimension,
     BlockPos pos
 ) {
 
     public static final Codec<DimensionalBlockPos> CODEC = RecordCodecBuilder.create(
         instance -> instance.group(
-            ResourceLocation.CODEC.fieldOf("dimID").forGetter(DimensionalBlockPos::dimension),
+            Identifier.CODEC.fieldOf("dimID").forGetter(DimensionalBlockPos::dimension),
             BlockPos.CODEC.fieldOf("pos").forGetter(DimensionalBlockPos::pos)
         ).apply(instance, DimensionalBlockPos::new)
     );
