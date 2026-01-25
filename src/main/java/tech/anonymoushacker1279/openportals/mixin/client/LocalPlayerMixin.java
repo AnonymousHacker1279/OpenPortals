@@ -12,9 +12,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import tech.anonymoushacker1279.openportals.CustomPortalBlock;
+import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.OpenPortals;
-import tech.anonymoushacker1279.openportals.util.PortalLink;
+import tech.anonymoushacker1279.openportals.portal.PortalLink;
 
 @Mixin(LocalPlayer.class)
 public class LocalPlayerMixin {
@@ -45,12 +45,12 @@ public class LocalPlayerMixin {
 		}
 
 		if (portalBlock instanceof CustomPortalBlock customportalblock && portalPos != null) {
-			PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(customportalblock.getPortalBase(player.level(), portalPos));
-			if (link != null && link.triggerSoundLocation != null) {
+			PortalLink link = OpenPortals.getPortalManager().getPortalLinkFromBase(customportalblock.getCachedPortalBase(player.level(), portalPos));
+			if (link != null && link.getTriggerSoundIdentifier() != null) {
 				return SimpleSoundInstance.forLocalAmbience(
-						BuiltInRegistries.SOUND_EVENT.get(link.triggerSoundLocation).orElseThrow().value(),
-						link.triggerSoundVolume.apply(player),
-						link.triggerSoundPitch.apply(player)
+						BuiltInRegistries.SOUND_EVENT.get(link.getTriggerSoundIdentifier()).orElseThrow().value(),
+						link.getTriggerSound().volumeFunction().apply(player),
+						link.getTriggerSound().pitchFunction().apply(player)
 				);
 			}
 		}

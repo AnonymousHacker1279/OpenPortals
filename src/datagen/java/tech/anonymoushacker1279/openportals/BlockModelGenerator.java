@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplate;
 import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplateBuilder;
+import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 
 public class BlockModelGenerator extends ModelProvider {
 
@@ -39,8 +40,12 @@ public class BlockModelGenerator extends ModelProvider {
 						.from(6, 0, 0)
 						.to(10, 16, 16)
 						.texture(TextureSlot.TEXTURE)
-						.face(Direction.EAST, faceBuilder -> faceBuilder.texture(TextureSlot.TEXTURE))
-						.face(Direction.WEST, faceBuilder -> faceBuilder.texture(TextureSlot.TEXTURE)))
+						.face(Direction.EAST, faceBuilder -> faceBuilder
+								.texture(TextureSlot.TEXTURE)
+								.tintindex(1))
+						.face(Direction.WEST, faceBuilder -> faceBuilder
+								.texture(TextureSlot.TEXTURE)
+								.tintindex(1)))
 				.build();
 
 		ExtendedModelTemplate templateNS = ExtendedModelTemplateBuilder.builder()
@@ -52,8 +57,12 @@ public class BlockModelGenerator extends ModelProvider {
 						.from(0, 0, 6)
 						.to(16, 16, 10)
 						.texture(TextureSlot.TEXTURE)
-						.face(Direction.NORTH, faceBuilder -> faceBuilder.texture(TextureSlot.TEXTURE))
-						.face(Direction.SOUTH, faceBuilder -> faceBuilder.texture(TextureSlot.TEXTURE)))
+						.face(Direction.NORTH, faceBuilder -> faceBuilder
+								.texture(TextureSlot.TEXTURE)
+								.tintindex(1))
+						.face(Direction.SOUTH, faceBuilder -> faceBuilder
+								.texture(TextureSlot.TEXTURE)
+								.tintindex(1)))
 				.build();
 
 		ExtendedModelTemplate templateUD = ExtendedModelTemplateBuilder.builder()
@@ -65,8 +74,12 @@ public class BlockModelGenerator extends ModelProvider {
 						.from(0, 6, 0)
 						.to(16, 10, 16)
 						.texture(TextureSlot.TEXTURE)
-						.face(Direction.UP, faceBuilder -> faceBuilder.texture(TextureSlot.TEXTURE))
-						.face(Direction.DOWN, faceBuilder -> faceBuilder.texture(TextureSlot.TEXTURE)))
+						.face(Direction.UP, faceBuilder -> faceBuilder
+								.texture(TextureSlot.TEXTURE)
+								.tintindex(1))
+						.face(Direction.DOWN, faceBuilder -> faceBuilder
+								.texture(TextureSlot.TEXTURE)
+								.tintindex(1)))
 				.build();
 
 		models.blockStateOutput.accept(MultiVariantGenerator.dispatch(block)

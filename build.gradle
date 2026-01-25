@@ -108,6 +108,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.jetbrains:annotations:26.0.2'
 }
 
 tasks.named("processResources", ProcessResources).configure {
@@ -165,6 +166,39 @@ publishing {
             }
         }
     }
+}
+
+if (file("RELEASE_NOTES.md").exists()) {
+    publisher {
+        apiKeys {
+            // Load API keys from tokens.properties file
+            Properties tokens = new Properties()
+            file("tokens.properties").withInputStream {
+                stream -> tokens.load(stream)
+            }
+
+            curseforge = tokens.getProperty("curseforge")
+            modrinth = tokens.getProperty("modrinth")
+        }
+
+        setDebug(false)
+        setCurseID("1442572")
+        // setModrinthID("")
+        setGithubRepo("AnonymousHacker1279/OpenPortals")
+        setVersionType("release")
+        // Read the contents of the RELEASE_NOTES.md file
+        setChangelog(file("RELEASE_NOTES.md").text)
+        setVersion("v" + mod_version)
+        setDisplayName("OpenPortals - v" + mod_version)
+        setGameVersions([minecraft_version])
+        setLoaders("neoforge")
+        setCurseEnvironment("both")
+        setArtifact(tasks.jar)
+        setJavaVersions([JavaVersion.VERSION_21])
+        addAdditionalFile(javadocJar, sourcesJar)
+    }
+} else {
+    println("No RELEASE_NOTES.md found, publishing outside of Maven is disabled.")
 }
 
 tasks.withType(JavaCompile).configureEach {

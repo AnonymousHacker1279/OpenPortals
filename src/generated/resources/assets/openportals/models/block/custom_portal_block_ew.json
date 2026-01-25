@@ -3,10 +3,12 @@
     {
       "faces": {
         "east": {
-          "texture": "#texture"
+          "texture": "#texture",
+          "tintindex": 1
         },
         "west": {
-          "texture": "#texture"
+          "texture": "#texture",
+          "tintindex": 1
         }
       },
       "from": [

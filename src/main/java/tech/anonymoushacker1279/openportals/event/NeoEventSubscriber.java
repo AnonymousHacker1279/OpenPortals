@@ -1,6 +1,5 @@
 package tech.anonymoushacker1279.openportals.event;
 
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -12,6 +11,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import tech.anonymoushacker1279.openportals.OpenPortals;
 import tech.anonymoushacker1279.openportals.portal.PortalIgniter;
 import tech.anonymoushacker1279.openportals.portal.PortalIgnitionSource;
@@ -26,6 +26,18 @@ public class NeoEventSubscriber {
 		OpenPortals.getPortalManager().setStorage(event.getServer().overworld()
 				.getDataStorage()
 				.computeIfAbsent(PortalLinkingStorage.TYPE));
+	}
+
+	@SubscribeEvent
+	public static void onServerStopping(ServerStoppingEvent event) {
+		// Clean up orphaned portal links before shutdown
+		PortalLinkingStorage storage = OpenPortals.getPortalManager().getStorage();
+		if (storage != null) {
+			int removed = storage.cleanupOrphanedLinks(event.getServer());
+			if (removed > 0) {
+				OpenPortals.LOGGER.info("Cleaned up {} orphaned portal link(s) during shutdown", removed);
+			}
+		}
 	}
 
 	@SubscribeEvent
