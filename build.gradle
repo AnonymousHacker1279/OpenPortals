@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.140'
+    id 'net.neoforged.moddev' version '2.0.141'
     id "com.hypherionmc.modutils.modpublisher" version "2.1.8"
     id 'idea'
 }
@@ -19,7 +19,7 @@ base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 println('Java: ' + System.getProperty('java.version') + ' | JVM: ' + System.getProperty('java.vm.version') + ' (' + System.getProperty('java.vendor') + ') | Arch: ' + System.getProperty('os.arch'))
 
@@ -50,11 +50,6 @@ neoForge {
     version = project.neo_version
     addModdingDependenciesTo sourceSets.test
     addModdingDependenciesTo sourceSets.datagen
-
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
 
     validateAccessTransformers = true
 
@@ -183,7 +178,7 @@ if (file("RELEASE_NOTES.md").exists()) {
 
         setDebug(false)
         setCurseID("1442572")
-        // setModrinthID("")
+        setModrinthID("gENo9K7n")
         setGithubRepo("AnonymousHacker1279/OpenPortals")
         setVersionType("release")
         // Read the contents of the RELEASE_NOTES.md file
@@ -194,7 +189,7 @@ if (file("RELEASE_NOTES.md").exists()) {
         setLoaders("neoforge")
         setCurseEnvironment("both")
         setArtifact(tasks.jar)
-        setJavaVersions([JavaVersion.VERSION_21])
+        setJavaVersions([JavaVersion.VERSION_25])
         addAdditionalFile(javadocJar, sourcesJar)
     }
 } else {

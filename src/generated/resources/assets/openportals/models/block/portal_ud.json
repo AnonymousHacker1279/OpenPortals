@@ -4,11 +4,11 @@
       "faces": {
         "down": {
           "texture": "#texture",
-          "tintindex": 1
+          "tintindex": 0
         },
         "up": {
           "texture": "#texture",
-          "tintindex": 1
+          "tintindex": 0
         }
       },
       "from": [
@@ -23,9 +23,8 @@
       ]
     }
   ],
-  "render_type": "minecraft:translucent",
   "textures": {
-    "particle": "minecraft:block/nether_portal",
-    "texture": "minecraft:block/nether_portal"
+    "particle": "openportals:block/portal",
+    "texture": "openportals:block/portal"
   }
 }

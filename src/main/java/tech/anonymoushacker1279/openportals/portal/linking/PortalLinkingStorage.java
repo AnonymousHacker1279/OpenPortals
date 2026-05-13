@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -11,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jetbrains.annotations.Nullable;
+import tech.anonymoushacker1279.openportals.OpenPortals;
 import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class PortalLinkingStorage extends SavedData {
 	);
 
 	public static final SavedDataType<PortalLinkingStorage> TYPE = new SavedDataType<>(
-			"openportals_dimension_links",
+			Identifier.fromNamespaceAndPath(OpenPortals.MOD_ID, "dimension_links"),
 			PortalLinkingStorage::new,
 			CODEC,
 			null

@@ -4,8 +4,8 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.block.BlockModelShaper;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.block.BlockStateModelSet;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.PortalProcessor;
 import net.minecraft.world.level.block.Blocks;
@@ -17,8 +17,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.OpenPortals;
+import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.portal.PortalLink;
 
 @Mixin(Gui.class)
@@ -31,7 +31,7 @@ public class InGameHudMixin {
 	@Unique
 	private int openportals$lastColor = -1;
 
-	@ModifyExpressionValue(method = "renderPortalOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;white(F)I"))
+	@ModifyExpressionValue(method = "extractPortalOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;white(F)I"))
 	public int changeColor(int original) {
 		if (minecraft.player == null) {
 			return original;
@@ -41,17 +41,19 @@ public class InGameHudMixin {
 		return openportals$lastColor >= 0 ? openportals$lastColor : original;
 	}
 
-	@Redirect(method = "renderPortalOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/BlockModelShaper;getParticleIcon(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;"))
-	public TextureAtlasSprite renderCustomPortalOverlay(BlockModelShaper blockModels, BlockState blockState) {
+	@Redirect(method = "extractPortalOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/BlockStateModelSet;getParticleMaterial(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/resources/model/sprite/Material$Baked;"))
+	public Material.Baked renderCustomPortalOverlay(BlockStateModelSet instance, BlockState blockState) {
 		if (openportals$lastColor >= 0) {
-			return this.minecraft.getBlockRenderer()
-					.getBlockModelShaper()
-					.getParticleIcon(OpenPortals.CUSTOM_PORTAL_BLOCK.get().defaultBlockState());
+			return this.minecraft
+					.getModelManager()
+					.getBlockStateModelSet()
+					.getParticleMaterial(OpenPortals.CUSTOM_PORTAL_BLOCK.get().defaultBlockState());
 		}
 
-		return this.minecraft.getBlockRenderer()
-				.getBlockModelShaper()
-				.getParticleIcon(Blocks.NETHER_PORTAL.defaultBlockState());
+		return this.minecraft
+				.getModelManager()
+				.getBlockStateModelSet()
+				.getParticleMaterial(Blocks.NETHER_PORTAL.defaultBlockState());
 	}
 
 	@Unique

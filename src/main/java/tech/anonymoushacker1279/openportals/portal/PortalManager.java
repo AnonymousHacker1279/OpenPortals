@@ -91,16 +91,6 @@ public class PortalManager {
 	}
 
 	/**
-	 * Set the portal linking storage. Set on server start via
-	 * {@link NeoEventSubscriber#onServerStart(ServerStartedEvent)}.
-	 *
-	 * @param storage the portal linking storage
-	 */
-	public void setStorage(PortalLinkingStorage storage) {
-		portalLinkingStorage = storage;
-	}
-
-	/**
 	 * Get the portal linking storage. This should only be null if the server has not started yet.
 	 *
 	 * @return the portal linking storage, or null if not set
@@ -108,5 +98,15 @@ public class PortalManager {
 	@Nullable
 	public PortalLinkingStorage getStorage() {
 		return portalLinkingStorage;
+	}
+
+	/**
+	 * Set the portal linking storage. Set on server start via
+	 * {@link NeoEventSubscriber#onServerStart(ServerStartedEvent)}.
+	 *
+	 * @param storage the portal linking storage
+	 */
+	public void setStorage(PortalLinkingStorage storage) {
+		portalLinkingStorage = storage;
 	}
 }

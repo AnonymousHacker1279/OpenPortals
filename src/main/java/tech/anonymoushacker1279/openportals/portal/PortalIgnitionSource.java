@@ -18,23 +18,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PortalIgnitionSource {
 
-	public enum SourceType {
-		USE_ITEM,
-		BLOCK_PLACED,
-		FLUID,
-		CUSTOM
-	}
-
 	public static final PortalIgnitionSource FIRE = new PortalIgnitionSource(
 			SourceType.BLOCK_PLACED,
 			BuiltInRegistries.BLOCK.getKey(Blocks.FIRE));
 	public static final PortalIgnitionSource WATER = fromFluid(Fluids.WATER);
-
 	private static final Set<Item> REGISTERED_ITEMS = ConcurrentHashMap.newKeySet();
-
 	public final SourceType sourceType;
 	public final Identifier ignitionSourceID;
-
 	@Nullable
 	public Player player;
 
@@ -115,5 +105,12 @@ public class PortalIgnitionSource {
 		return BuiltInRegistries.FLUID.get(ignitionSourceID)
 				.map(holder -> holder.is(FluidTags.LAVA))
 				.orElse(false);
+	}
+
+	public enum SourceType {
+		USE_ITEM,
+		BLOCK_PLACED,
+		FLUID,
+		CUSTOM
 	}
 }

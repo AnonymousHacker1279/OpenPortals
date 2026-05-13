@@ -4,14 +4,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.ApiStatus;
-import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.OpenPortals;
+import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.portal.PortalIgnitionSource;
 import tech.anonymoushacker1279.openportals.portal.PortalLink;
 import tech.anonymoushacker1279.openportals.portal.frame.FlatPortalFrameTester;
@@ -94,7 +95,7 @@ public class CustomPortalBuilder {
 	 */
 	@ApiStatus.AvailableSince("1.0.0")
 	public CustomPortalBuilder tintColor(int r, int g, int b) {
-		builder.color(((r & 0x0ff) << 16) | ((g & 0x0ff) << 8) | (b & 0x0ff));
+		builder.color(ARGB.color(r, g, b));
 		return this;
 	}
 

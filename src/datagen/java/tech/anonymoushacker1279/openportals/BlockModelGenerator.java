@@ -8,10 +8,10 @@ import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.TextureSlot;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplate;
 import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplateBuilder;
 import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
@@ -22,18 +22,12 @@ public class BlockModelGenerator extends ModelProvider {
 		super(output, OpenPortals.MOD_ID);
 	}
 
-	@Override
-	protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
-		generatePortal(blockModels, OpenPortals.CUSTOM_PORTAL_BLOCK.get());
-	}
-
 	private static void generatePortal(BlockModelGenerators models, Block block) {
-		TextureMapping mapping = TextureMapping.defaultTexture(Blocks.NETHER_PORTAL)
-				.put(TextureSlot.PARTICLE, ModelLocationUtils.getModelLocation(Blocks.NETHER_PORTAL));
+		TextureMapping mapping = TextureMapping.defaultTexture(OpenPortals.CUSTOM_PORTAL_BLOCK.get())
+				.put(TextureSlot.PARTICLE, new Material(ModelLocationUtils.getModelLocation(OpenPortals.CUSTOM_PORTAL_BLOCK.get())));
 
 		ExtendedModelTemplate templateEW = ExtendedModelTemplateBuilder.builder()
 				.suffix("_ew")
-				.renderType("translucent")
 				.requiredTextureSlot(TextureSlot.TEXTURE)
 				.requiredTextureSlot(TextureSlot.PARTICLE)
 				.element(builder -> builder
@@ -42,15 +36,14 @@ public class BlockModelGenerator extends ModelProvider {
 						.texture(TextureSlot.TEXTURE)
 						.face(Direction.EAST, faceBuilder -> faceBuilder
 								.texture(TextureSlot.TEXTURE)
-								.tintindex(1))
+								.tintindex(0))
 						.face(Direction.WEST, faceBuilder -> faceBuilder
 								.texture(TextureSlot.TEXTURE)
-								.tintindex(1)))
+								.tintindex(0)))
 				.build();
 
 		ExtendedModelTemplate templateNS = ExtendedModelTemplateBuilder.builder()
 				.suffix("_ns")
-				.renderType("translucent")
 				.requiredTextureSlot(TextureSlot.TEXTURE)
 				.requiredTextureSlot(TextureSlot.PARTICLE)
 				.element(builder -> builder
@@ -59,15 +52,14 @@ public class BlockModelGenerator extends ModelProvider {
 						.texture(TextureSlot.TEXTURE)
 						.face(Direction.NORTH, faceBuilder -> faceBuilder
 								.texture(TextureSlot.TEXTURE)
-								.tintindex(1))
+								.tintindex(0))
 						.face(Direction.SOUTH, faceBuilder -> faceBuilder
 								.texture(TextureSlot.TEXTURE)
-								.tintindex(1)))
+								.tintindex(0)))
 				.build();
 
 		ExtendedModelTemplate templateUD = ExtendedModelTemplateBuilder.builder()
 				.suffix("_ud")
-				.renderType("translucent")
 				.requiredTextureSlot(TextureSlot.TEXTURE)
 				.requiredTextureSlot(TextureSlot.PARTICLE)
 				.element(builder -> builder
@@ -76,10 +68,10 @@ public class BlockModelGenerator extends ModelProvider {
 						.texture(TextureSlot.TEXTURE)
 						.face(Direction.UP, faceBuilder -> faceBuilder
 								.texture(TextureSlot.TEXTURE)
-								.tintindex(1))
+								.tintindex(0))
 						.face(Direction.DOWN, faceBuilder -> faceBuilder
 								.texture(TextureSlot.TEXTURE)
-								.tintindex(1)))
+								.tintindex(0)))
 				.build();
 
 		models.blockStateOutput.accept(MultiVariantGenerator.dispatch(block)
@@ -89,5 +81,10 @@ public class BlockModelGenerator extends ModelProvider {
 						.select(Direction.Axis.Y, BlockModelGenerators.plainVariant(templateUD.create(block, mapping, models.modelOutput)))
 				)
 		);
+	}
+
+	@Override
+	protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
+		generatePortal(blockModels, OpenPortals.CUSTOM_PORTAL_BLOCK.get());
 	}
 }
