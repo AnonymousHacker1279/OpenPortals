@@ -17,7 +17,7 @@ public class OpenPortals {
 	public static final String MOD_ID = "openportals";
 	public static final Logger LOGGER = LogUtils.getLogger();
 	public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MOD_ID);
-	public static final Supplier<CustomPortalBlock> CUSTOM_PORTAL_BLOCK = BLOCKS.registerBlock("custom_portal_block",
+	public static final Supplier<CustomPortalBlock> CUSTOM_PORTAL_BLOCK = BLOCKS.registerBlock("portal",
 			(properties) -> new CustomPortalBlock(properties
 					.noCollision()
 					.randomTicks()

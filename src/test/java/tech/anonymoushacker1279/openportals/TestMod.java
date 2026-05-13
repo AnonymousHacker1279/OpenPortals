@@ -40,7 +40,7 @@ public class TestMod {
 						(entity) -> 1.0f
 				)
 				.triggerSound(SoundEvents.WATER_AMBIENT.location(), (entity) -> entity.getRandom().nextFloat() * 0.4F + 0.8F, (entity) -> 1.0f)
-				.ambientSound(SoundEvents.AMETHYST_BLOCK_CHIME.location(), (level -> 1.0f), (level) -> level.random.nextFloat() * 0.4F + 0.8F)
+				.ambientSound(SoundEvents.AMETHYST_BLOCK_CHIME.location(), (level -> 1.0f), (level) -> level.getRandom().nextFloat() * 0.4F + 0.8F)
 				.portalParticle((level, pos) -> ParticleTypes.CRIT)
 				.build();
 	}

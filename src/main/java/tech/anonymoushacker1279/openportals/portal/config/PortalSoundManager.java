@@ -18,27 +18,6 @@ import java.util.function.Function;
  */
 public class PortalSoundManager {
 
-	/**
-	 * Immutable sound configuration.
-	 *
-	 * @param soundIdentifier the identifier of the sound to play
-	 * @param volumeFunction  function to determine the volume
-	 * @param pitchFunction   function to determine the pitch
-	 * @param <T>             the type of context object (Entity or Level)
-	 */
-	public record SoundConfiguration<T>(
-			@Nullable Identifier soundIdentifier,
-			Function<T, Float> volumeFunction,
-			Function<T, Float> pitchFunction) {
-
-		/**
-		 * Create a default sound configuration with no sound.
-		 */
-		public static <T> SoundConfiguration<T> silent() {
-			return new SoundConfiguration<>(null, context -> 0.0f, context -> 0.0f);
-		}
-	}
-
 	private final SoundConfiguration<Entity> travelSound;
 	private final SoundConfiguration<Entity> triggerSound;
 	private final SoundConfiguration<Level> ambientSound;
@@ -86,6 +65,27 @@ public class PortalSoundManager {
 	}
 
 	/**
+	 * Immutable sound configuration.
+	 *
+	 * @param soundIdentifier the identifier of the sound to play
+	 * @param volumeFunction  function to determine the volume
+	 * @param pitchFunction   function to determine the pitch
+	 * @param <T>             the type of context object (Entity or Level)
+	 */
+	public record SoundConfiguration<T>(
+			@Nullable Identifier soundIdentifier,
+			Function<T, Float> volumeFunction,
+			Function<T, Float> pitchFunction) {
+
+		/**
+		 * Create a default sound configuration with no sound.
+		 */
+		public static <T> SoundConfiguration<T> silent() {
+			return new SoundConfiguration<>(null, context -> 0.0f, context -> 0.0f);
+		}
+	}
+
+	/**
 	 * Builder for creating {@link PortalSoundManager} instances.
 	 */
 	public static class Builder {
@@ -102,7 +102,7 @@ public class PortalSoundManager {
 		private SoundConfiguration<Level> ambientSound = new SoundConfiguration<>(
 				BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.PORTAL_AMBIENT),
 				level -> 0.5f,
-				level -> level.random.nextFloat() * 0.4F + 0.8F);
+				level -> level.getRandom().nextFloat() * 0.4F + 0.8F);
 
 		public void travelSound(Identifier soundIdentifier, Function<Entity, Float> volume, Function<Entity, Float> pitch) {
 			this.travelSound = new SoundConfiguration<>(soundIdentifier, volume, pitch);

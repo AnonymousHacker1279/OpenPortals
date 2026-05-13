@@ -36,30 +36,30 @@ import java.util.concurrent.TimeUnit;
 
 public class CustomPortalBlock extends Block implements Portal {
 
-	private static final Cache<BlockPos, PortalInfo> PORTAL_CACHE = CacheBuilder.newBuilder()
-			.expireAfterWrite(10, TimeUnit.SECONDS)
-			.maximumSize(1000)
-			.build();
-
-	/**
-	 * Cached portal information for a position.
-	 */
-	private record PortalInfo(Block portalBase, @Nullable PortalLink link) {
-	}
-
 	public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
 	protected static final VoxelShape X_SHAPE = Block.box(0.0D, 0.0D, 6.0D, 16.0D, 16.0D, 10.0D);
 	protected static final VoxelShape Z_SHAPE = Block.box(6.0D, 0.0D, 0.0D, 10.0D, 16.0D, 16.0D);
 	protected static final VoxelShape Y_SHAPE = Block.box(0.0D, 6.0D, 0.0D, 16.0D, 10.0D, 16.0D);
-
+	private static final Cache<BlockPos, PortalInfo> PORTAL_CACHE = CacheBuilder.newBuilder()
+			.expireAfterWrite(10, TimeUnit.SECONDS)
+			.maximumSize(1000)
+			.build();
 	public CustomPortalBlock(Properties properties) {
 		super(properties);
 		registerDefaultState(stateDefinition.any().setValue(AXIS, Direction.Axis.X));
 	}
 
 	/**
-	 * Get cached portal information for a position.
-	 * If not cached, computes and caches the portal base and link.
+	 * Invalidate the cache for a specific position. Called when a portal block is destroyed or modified.
+	 *
+	 * @param pos the position to invalidate
+	 */
+	public static void invalidateCache(BlockPos pos) {
+		PORTAL_CACHE.invalidate(pos);
+	}
+
+	/**
+	 * Get cached portal information for a position. If not cached, computes and caches the portal base and link.
 	 *
 	 * @param level the level
 	 * @param pos   the portal block position
@@ -81,18 +81,7 @@ public class CustomPortalBlock extends Block implements Portal {
 	}
 
 	/**
-	 * Invalidate the cache for a specific position.
-	 * Called when a portal block is destroyed or modified.
-	 *
-	 * @param pos the position to invalidate
-	 */
-	public static void invalidateCache(BlockPos pos) {
-		PORTAL_CACHE.invalidate(pos);
-	}
-
-	/**
-	 * Get the portal base block for this portal position.
-	 * Uses cached value if available.
+	 * Get the portal base block for this portal position. Uses cached value if available.
 	 *
 	 * @param level the level
 	 * @param pos   the portal block position
@@ -219,5 +208,11 @@ public class CustomPortalBlock extends Block implements Portal {
 	@Override
 	public Transition getLocalTransition() {
 		return Transition.CONFUSION;
+	}
+
+	/**
+	 * Cached portal information for a position.
+	 */
+	private record PortalInfo(Block portalBase, @Nullable PortalLink link) {
 	}
 }

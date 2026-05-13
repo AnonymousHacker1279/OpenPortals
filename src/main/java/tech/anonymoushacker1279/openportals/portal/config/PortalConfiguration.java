@@ -2,8 +2,8 @@ package tech.anonymoushacker1279.openportals.portal.config;
 
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
-import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.OpenPortals;
+import tech.anonymoushacker1279.openportals.portal.CustomPortalBlock;
 import tech.anonymoushacker1279.openportals.portal.PortalIgnitionSource;
 import tech.anonymoushacker1279.openportals.portal.frame.PortalFrameTester;
 import tech.anonymoushacker1279.openportals.portal.frame.VerticalPortalFrameTester;
@@ -151,12 +151,12 @@ public class PortalConfiguration {
 	 * Builder for creating immutable {@link PortalConfiguration} instances.
 	 */
 	public static class Builder {
+		private final boolean onlyIgnitableInReturnDimension = false;
 		private Block frameBlock;
 		private PortalIgnitionSource ignitionSource = PortalIgnitionSource.FIRE;
 		private CustomPortalBlock portalBlock = OpenPortals.CUSTOM_PORTAL_BLOCK.get();
 		private Identifier targetDimensionIdentifier = Identifier.withDefaultNamespace("nether");
 		private Identifier returnDimensionIdentifier = Identifier.withDefaultNamespace("overworld");
-		private final boolean onlyIgnitableInReturnDimension = false;
 		private int color = 0;
 		private int strictWidth = 0;
 		private int strictHeight = 0;
