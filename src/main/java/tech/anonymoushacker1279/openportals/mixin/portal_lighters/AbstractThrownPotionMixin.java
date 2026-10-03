@@ -19,7 +19,7 @@ public abstract class AbstractThrownPotionMixin extends ThrowableItemProjectile 
 		super(entityType, level);
 	}
 
-	@Inject(method = "dowseFire", at = @At("HEAD"))
+	@Inject(method = "douseFire", at = @At("HEAD"))
 	public void attemptPortalLight(BlockPos pos, CallbackInfo ci) {
 		PortalIgniter.attemptPortalLight(this.level(), pos, PortalIgnitionSource.WATER);
 	}
